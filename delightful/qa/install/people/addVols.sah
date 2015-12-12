@@ -1,0 +1,86 @@
+
+function addVolSkillsToList($strSkillName){
+    _click(_link("nb_admin_home"));
+    _click(_link("Lists[1]"));
+    _click(_link("Skills"));
+    _click(_link("Add New Skills the Volunteer Possesses"));
+    _setValue(_textbox("txtListItem"), $strSkillName);
+    _click(_submit("Add New Skill"));
+    _assertExists(_cell($strSkillName));
+    _assert(_isVisible(_cell($strSkillName)));
+}
+
+
+
+function addVolunteer($lPeopleID, $strNameMatch){
+/*
+    _click(_link("nb_search_p"));
+    _setValue(_textbox("txtSearch1"), $lPeopleID);
+    _click(_submit("Search"));
+    _assertExists(_cell($strNameMatch));
+    _assert(_isVisible(_cell($strNameMatch)));
+*/    
+    goToPeopleRec($lPeopleID, $strNameMatch);
+    _click(_link("Add as volunteer"));
+    _assertExists(_cell("Active (view)"));
+    _assert(_isVisible(_cell("Active (view)")));
+    _assertEqual("Active (view)", _getText(_cell("Active (view)")));
+    _assertContainsText("Active (view)", _cell("Active (view)"));
+}
+
+
+function addSkillsToVol($lVolID, $strNameMatch, 
+           $strSkillIDX_0, $strSkillIDX_1,
+           $strSkill_0, $strSkill_1){
+/*           
+    _click(_link("nb_search_vol"));
+    _setValue(_textbox("txtSearch1"), $lVolID);
+    _click(_submit("Search"));
+    _assertExists(_cell($strNameMatch));
+*/    
+    goToVolRec($lVolID, $strNameMatch);
+
+    _click(_link("Edit Volunteer Skills"));
+    _click(_checkbox($strSkillIDX_0));
+    _click(_checkbox($strSkillIDX_1));
+    _click(_submit("Update Skills"));
+    _click(_image("plus.gif[2]"));
+    
+    _assertExists(_listItem($strSkill_0));
+    _assertExists(_listItem($strSkill_1));
+}
+
+
+
+
+
+function createVolRecs($strLoginPath){
+    _log("==> entering createVolRecs");
+    setPathToDLTest($strLoginPath);
+    logIn("admin", "admin");
+
+    addVolSkillsToList("People Skills");
+    addVolSkillsToList("Retail Sales");
+
+    addVolunteer(1, "Mr. Abner P. Applegate (Ab)");
+    addVolunteer(2, "Ms. Sandy A. Beach");
+    addVolunteer(3, "Madam Secretary Betty Apple");
+    addVolunteer(4, "Dr. Alice Archer");
+    
+    addSkillsToVol(1, "Mr. Abner P. Applegate (Ab) (people ID 00001)", 
+                 "chkSkill[][0]",    "chkSkill[][2]", 
+                 "Event management", "Landscaping");
+                 
+    addSkillsToVol(2, "Ms. Sandy A. Beach   (people ID 00002)", 
+                 "chkSkill[][3]",    "chkSkill[][4]", 
+                 "Office skills", "People Skills");
+                 
+    addSkillsToVol(3, "Madam Secretary Betty Apple   (people ID 00003)", 
+                 "chkSkill[][3]",    "chkSkill[][4]", 
+                 "Office skills", "People Skills");
+
+    signOut();
+}
+
+
+

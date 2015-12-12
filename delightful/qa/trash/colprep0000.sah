@@ -1,0 +1,3 @@
+_setValue(_textbox("username"), "admin");
+_setValue(_password("password"), "admin");
+_click(_submit("Log In"));

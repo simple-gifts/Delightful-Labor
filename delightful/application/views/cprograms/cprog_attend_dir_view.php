@@ -1,0 +1,5 @@
+<?php
+
+
+echoT('<br>'.$strAttendance);
+

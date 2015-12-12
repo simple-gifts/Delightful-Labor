@@ -1,0 +1,82 @@
+
+_include("../../utilities/util_01.sah");
+
+function testAOC(){
+    _click(_link("Lists"));
+    _assertExists(_link("Accounting Country of Origin"));
+    _assert(_isVisible(_link("Accounting Country of Origin")));
+    _assertEqual("Accounting Country of Origin", _getText(_link("Accounting Country of Origin")));
+    _assertContainsText("Accounting Country of Origin", _link("Accounting Country of Origin"));
+    _click(_link("Accounting Country of Origin"));
+    _click(_checkbox("chkACO[][29]"));
+    _click(_radio("rdoDefault[29]"));
+    _click(_submit("Update Accounting Countries"));
+    _assertExists(_checkbox("chkACO[][29]"));
+    _assert(_isVisible(_checkbox("chkACO[][29]")));
+    _assert(_checkbox("chkACO[][29]").checked);
+    _assertExists(_radio("rdoDefault[29]"));
+    _assert(_isVisible(_radio("rdoDefault[29]")));
+    _assert(_radio("rdoDefault[29]").checked);
+    _click(_radio("rdoDefault[28]"));
+    _click(_checkbox("chkACO[][29]"));
+    _click(_submit("Update Accounting Countries"));
+}
+
+function testBizCategory(){
+    _click(_link("Lists[1]"));
+    _click(_link("Business Categories"));
+    _click(_link("Add New Business/Organization Categories"));
+    _setValue(_textbox("txtListItem"), "Catering");
+    _click(_submit("Add New Category"));
+    _assertExists(_cell("Catering"));
+    _assert(_isVisible(_cell("Catering")));
+    _assertEqual("Catering", _getText(_cell("Catering")));
+    _assertContainsText("Catering", _cell("Catering"));
+    _assertExists(_cell("Catering"));
+    _assert(_isVisible(_cell("Catering")));
+    _assertEqual("Catering", _getText(_cell("Catering")));
+    _assertContainsText("Catering", _cell("Catering"));
+    _assertExists(_cell("Catering"));
+    _assert(_isVisible(_cell("Catering")));
+    _assertEqual("Catering", _getText(_cell("Catering")));
+    _assertContainsText("Catering", _cell("Catering"));
+    _click(_image("Remove list item"));
+    _expectConfirm("Are you sure you want to retire this list item?", true);
+    _click(_link("Add New Business/Organization Categories"));
+    _setValue(_textbox("txtListItem"), "Computers");
+    _click(_submit("Add New Category"));
+    _assertExists(_div("A list entry with this name is already defined."));
+    _assert(_isVisible(_div("A list entry with this name is already defined.")));
+    _assertEqual("A list entry with this name is already defined.", _getText(_div("A list entry with this name is already defined.")));
+    _assertContainsText("A list entry with this name is already defined.", _div("A list entry with this name is already defined."));
+}
+
+function testBizContactRel(){
+    _click(_link("Lists[1]"));
+    _click(_link("Business Contact Relationships"));
+    _click(_link("Add New Business/Organization Contact Relationships"));
+    _setValue(_textbox("txtListItem"), "Minion");
+    _click(_submit("Add New Relationship"));
+    _assertExists(_cell("Minion"));
+    _assert(_isVisible(_cell("Minion")));
+    _assertEqual("Minion", _getText(_cell("Minion")));
+    _assertContainsText("Minion", _cell("Minion"));
+    _assertExists(_cell("Minion"));
+    _assert(_isVisible(_cell("Minion")));
+    _assertEqual("Minion", _getText(_cell("Minion")));
+    _assertContainsText("Minion", _cell("Minion"));
+    _assertExists(_cell("Minion"));
+    _assert(_isVisible(_cell("Minion")));
+    _assertEqual("Minion", _getText(_cell("Minion")));
+    _assertContainsText("Minion", _cell("Minion"));
+    _click(_image("Remove list item[4]"));
+    _expectConfirm("Are you sure you want to retire this list item?", true);
+}
+
+setPathToDLTest("http://localhost/jz/release/delightful_150225/delightful/index.php");
+logIn("admin", "admin");
+testAOC();
+testBizCategory();
+testBizContactRel();
+signOut();
+

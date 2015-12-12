@@ -1,0 +1,10 @@
+[PHP]
+;----------------------------------------------------------------------------
+; debug version of php.ini
+; rename this file to php.ini and errors should be displayed to your screen
+; as well as written to a log file
+;----------------------------------------------------------------------------
+display_errors = On
+error_log = error_log
+error_reporting = E_ALL
+display_startup_errors = On

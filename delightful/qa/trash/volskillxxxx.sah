@@ -1,0 +1,17 @@
+_setValue(_textbox("username"), "admin");
+_setValue(_password("password"), "admin");
+_click(_submit("Log In"));
+_click(_link("admin"));
+_click(_link("Lists[1]"));
+_click(_link("Skills"));
+_click(_link("Add New Skills the Volunteer Possesses"));
+_setValue(_textbox("txtListItem"), "People Skills");
+_click(_submit("Add New Skill"));
+_click(_cell("People Skills"));
+_click(_cell("People Skills"));
+_click(_cell("People Skills"));
+_click(_cell("People Skills"));
+_click(_cell("People Skills"));
+_click(_image("Remove list item[4]"));
+_expectConfirm("Are you sure you want to retire this list item?", true);
+_click(_link("Sign Out"));

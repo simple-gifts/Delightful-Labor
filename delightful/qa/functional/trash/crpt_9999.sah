@@ -1,0 +1,9 @@
+_navigateTo("http://localhost/jz/release/delightful_150319/delightful/index.php/login");
+_setValue(_textbox("username"), "admin");
+_setValue(_password("password"), "admin");
+_click(_submit("Log In"));
+_click(_link("reports"));
+_click(_link("Add New[4]"));
+_setValue(_textbox("txtName"), "My test report");
+_click(_submit("Add Report"));
+_click(_submit("Save"));

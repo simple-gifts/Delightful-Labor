@@ -1,0 +1,16 @@
+_navigateTo("http://localhost/jz/release/delightful_150319/delightful");
+_setValue(_textbox("username"), "admin");
+_setValue(_password("password"), "admin");
+_click(_submit("Log In"));
+_click(_link("Add New"));
+_setValue(_textbox("txtName"), "Test Client Report");
+_setValue(_textarea("txtNotes"), "http://www.theuselessweb.com/");
+_click(_submit("Add Report"));
+_click(_image("plus.gif"));
+_click(_image("plus.gif"));
+_click(_checkbox("chkFields[][20]"));
+_click(_checkbox("chkFields[][19]"));
+_click(_submit("Save"));
+_click(_link("Run Report"));
+_click(_div("attendTable"));
+_click(_div("main"));

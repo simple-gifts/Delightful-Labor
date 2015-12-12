@@ -1,0 +1,6 @@
+<?php
+
+
+echoT($strRemRpt);
+
+

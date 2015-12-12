@@ -1,0 +1,105 @@
+// _navigateTo("http://localhost/jz/release/delightful_150420/delightful/index.php/login");
+// _setValue(_textbox("username"), "admin");
+// _setValue(_password("password"), "admin");
+// _click(_submit("Log In"));
+// _assertExists(_link("client"));
+// _assert(_isVisible(_link("client")));
+// _assertEqual("client", _getText(_link("client")));
+// _assertContainsText("client", _link("client"));
+// _click(_link("client"));
+// _click(_image("View client record"));
+// _click(_image("plus.gif[2]"));
+// _click(_image("plus.gif[2]"));
+// _click(_image("Edit table entries"));
+// _setValue(_textarea("uf000007_000038"), "Would like to be a medical doctor");
+// _click(_checkbox("uf000007_000039"));
+// _setSelected(_select("uf000007_000040"), "Medical Field");
+// _setValue(_textbox("uf000007_000042"), "Freedonia A&M");
+// _setValue(_textbox("uf000007_000044"), "9/15/2014");
+// _setValue(_textbox("uf000007_000045"), "3");
+// _setValue(_textbox("uf000007_000046"), "15000.00");
+// _setSelected(_select("uf000007_000047[][0]"), ["Calculus"]);
+// _setSelected(_select("uf000007_000047[][0]"), ["Calculus","Chemistry"]);
+// _click(_submit("Save"));
+// _assertExists(_cell("Medical Field"));
+// _assert(_isVisible(_cell("Medical Field")));
+// _assertEqual("Medical Field", _getText(_cell("Medical Field")));
+// _assertContainsText("Medical Field", _cell("Medical Field"));
+// _assertExists(_cell("Medical Field"));
+// _assert(_isVisible(_cell("Medical Field")));
+// _assertEqual("Medical Field", _getText(_cell("Medical Field")));
+// _assertContainsText("Medical Field", _cell("Medical Field"));
+// _assertExists(_cell("Medical Field"));
+// _assert(_isVisible(_cell("Medical Field")));
+// _assertEqual("Medical Field", _getText(_cell("Medical Field")));
+// _assertContainsText("Medical Field", _cell("Medical Field"));
+//
+
+function editClientCPrepPTable($lClientID, $strTestName, $strVocGoal, $strVocInterestDDL,
+            $strCollege1, $strCollege2, $strDateSAT, $str529Value,
+            $strAP1, $strAP2){
+
+   _click(_link("nb_search_cl"));
+   _setValue(_textbox("txtSearch1"), $lClientID);
+   _click(_submit("Search"));
+   _assertExists(_cell($strTestName));
+   _assert(_isVisible(_cell($strTestName)));
+   _click(_link("clientCTableDivImg"));   // expand ptables
+   _click(_link("ut_7ImgDiv"));           // expand College Prep table
+   _click(_link("editSingle_7"));         // edit ptable
+
+      // http://community.sahipro.com/forums/discussion/3094/how-to-use-if-and-else-condition-for-check-box
+      // http://community.sahipro.com/forums/discussion/2670/checkbox-is-checked-or-not
+   if(_condition(_checkbox("uf000007_000039").checked == false)){
+      _click(_checkbox("uf000007_000039")); // college track
+   }
+
+
+   _setValue(_textarea("uf000007_000038"), $strVocGoal);
+   _setSelected(_select("uf000007_000040"), $strVocInterestDDL);    // Vocational Interest ddl
+   _setValue(_textbox("uf000007_000042"), $strCollege1);
+   _setValue(_textbox("uf000007_000043"), $strCollege2);
+   _setValue(_textbox("uf000007_000044"), $strDateSAT);
+   _setValue(_textbox("uf000007_000046"), $str529Value);
+   _setSelected(_select("uf000007_000047[][0]"), [$strAP1, $strAP2]);
+   _click(_submit("Save"));
+
+   _assertExists(_cell($strVocInterestDDL));
+   _assert(_isVisible(_cell($strVocInterestDDL)));
+}
+
+function populateColPrepPTables($strLoginPath){
+    _log("==> entering populateColPrepPTables");
+    setPathToDLTest($strLoginPath);
+    logIn("admin", "admin");
+
+    editClientCPrepPTable(1, "Alice A Ackers (Female)",
+           "Would like to be a doctor of physics",
+           "Math/Science/Engineering",
+           "Freedonia A&M", "Freedonia State U.",
+           "9/22/2014", "12345.00",
+           "Calculus", "Chemistry");
+
+    editClientCPrepPTable(2, "Arnold O. Anderson (Male)",
+           "Not sure...\nWould like to be an astronaut or goat herder",
+           "Math/Science/Engineering",
+           "Freedonia Polytech", "Freedonia A&M",
+           "11/22/2014", "98760.00",
+           "Calculus", "History");
+
+    editClientCPrepPTable(4, "May K. Aliving (Female)",
+           "Would like to be the first farmer to land on Mars",
+           "Agriculture",
+           "Freedonia A&M", "Freedonia Astro Tech",
+           "9/1/2014", "345.00",
+           "Calculus", "Chemistry");
+
+    editClientCPrepPTable(5, "Gladys A. Friday (Female)",
+           "Hopes to one day manage databases for non-profits",
+           "Public Service",
+           "Freedonia A&M", "Freedonia Polytech",
+           "1/15/2015", "450345.00",
+           "Physics", "Chemistry");
+
+    signOut();
+}

@@ -1,0 +1,55 @@
+
+function addSingleClient(
+           $strGender, $strFName, $strMName, $strLName, $strAssertName,
+           $strBDate, $strEntryDate,
+           $strMaxSpon, $strStatus,
+           $strAddr1, $strAddr2, $strCity, $strState, $strZip, $strCountry,
+           $strEmail, $strPhone, $strCell
+           ){
+    _click(_link("mb_cl_new"));
+    _setSelected(_select("ddlLocation"), "The ABC Children's Home");
+    _setSelected(_select("ddlClientStatCat"), "Student Status");
+    _setSelected(_select("ddlClientVoc"), "Classroom Vocabulary");
+    _click(_submit("Submit"));
+    _setValue(_textbox("txtFName"), $strFName);
+    _setValue(_textbox("txtMName"), $strMName);
+    _setValue(_textbox("txtLName"), $strLName);
+    _setValue(_textbox("txtBDate"), $strBDate);
+    _setValue(_textbox("txtPEntryDate"), $strEntryDate);
+    _click(_checkbox("chkSP[]"));
+    _setValue(_textbox("txtMaxSpon"), $strMaxSpon);
+    _setSelected(_select("ddlStatus"), $strStatus);
+    _click(_radio($strGender));
+    _setSelected(_select("ddlAttrib"), "Sally, The Intern");
+    _setValue(_textbox("txtAddr1"), $strAddr1);
+    _setValue(_textbox("txtAddr2"), $strAddr2);
+    _setValue(_textbox("txtCity"), $strCity);
+    _setValue(_textbox("txtState"), $strState);
+    _setValue(_textbox("txtZip"), $strZip);
+    _setValue(_textbox("txtCountry"), $strCountry);
+    _setValue(_textbox("txtEmail"), $strEmail);
+    _setValue(_textbox("txtPhone"), $strPhone);
+    _setValue(_textbox("txtCell"), $strCell);
+    _click(_submit("Add Student"));
+    
+    _assertExists(_cell($strAssertName));
+    _assert(_isVisible(_cell($strAssertName)));
+}
+
+
+function addClients($strLoginPath){
+    _log("==> entering addPeopleGifts");
+    setPathToDLTest($strLoginPath);
+    logIn("admin", "admin");
+
+       // gender 0 - male, 1 - female, 2 - unknown
+    addSingleClient(
+           "rdoGender[1]", "Alice", "A", "Ackers", "Alice A Ackers (Female)",
+           "8/8/1999", "1/12/2015",
+           "2", "Current Student",
+           "123 Maple", "Apt. 22", "Round Rock", "Tx", "78123", "US",
+           "alice@test.com", "555-1212", "555-cell");
+    
+    signOut();
+}
+

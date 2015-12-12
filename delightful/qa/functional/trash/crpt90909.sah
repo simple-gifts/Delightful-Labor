@@ -1,0 +1,9 @@
+_click(_link("Add search term"));
+_click(_div("scrollCB"));
+_click(_radio("rdoField[22]"));
+_click(_submit("Select Field"));
+_setSelected(_select("ddlCompare"), "On or After");
+_click(_submit("Save search term"));
+_click(_link("Add sort term"));
+_click(_radio("rdoField[2]"));
+_click(_submit("Select Field"));

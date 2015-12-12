@@ -1,0 +1,13 @@
+<?php
+/*
+   This simple test will determine if you are able to run php scripts
+   from the target directory
+   
+   rename this file to php_info.php, then point your
+   browser to 
+       http://[your domain]/delightful/php_info.php
+       
+   The php version will be displayed at the top of the screen. Note that 
+   Delightful Labor required a php version of >= 5.3.0
+*/
+echo(phpInfo());

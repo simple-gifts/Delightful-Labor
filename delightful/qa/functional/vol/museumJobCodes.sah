@@ -1,0 +1,22 @@
+
+function addSingleJobCode($strJCode){
+    _click(_link("Add New Volunteer Shift Job Codes"));
+    _setValue(_textbox("txtListItem"), $strJCode);   
+    _click(_submit("Add New Job Code"));
+    _assertExists(_cell($strJCode));
+    _assert(_isVisible(_cell($strJCode)));
+}    
+    
+
+function addMuseumJobCodes(){
+    _log("==> entering addMuseumJobCodes");
+    
+    _click(_link("nb_admin_home"));
+    _click(_link("Lists[1]"));
+    _click(_link("Shift Job Codes"));
+ 
+    addSingleJobCode("5010 - Greeters");
+    addSingleJobCode("5020 - Tour Guides");
+    addSingleJobCode("5030 - Gift Shop");
+    addSingleJobCode("5040 - Parking Lot Attendant");
+}    

@@ -1,0 +1,6 @@
+_setValue(_textbox("username"), "admin");
+_setValue(_password("password"), "admin");
+_click(_submit("Log In"));
+_click(_link("more"));
+_click(_link("Categories[2]"));
+_click(_image("Add item[1]"));

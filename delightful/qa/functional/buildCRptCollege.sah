@@ -1,0 +1,147 @@
+
+function createScholarshipCRpt(){
+   _click(_link("reports"));
+   _click(_link("Report Directory[1]"));
+   _click(_link("Add new report"));
+   _setValue(_textbox("txtName"), "Freedonia Scholorship ");
+   _setValue(_textbox("txtName"), "Freedonia A&M Scholarship");
+   _setValue(_textarea("txtNotes"), "For high school girls interested in agriculture or STEM");
+   _click(_submit("Add Report"));
+   _click(_button("Clear All"));
+   _click(_checkbox("chkFields[][2]"));
+   _click(_checkbox("chkFields[][3]"));
+   _click(_checkbox("chkFields[][5]"));
+   _click(_checkbox("chkFields[][7]"));
+   _click(_checkbox("chkFields[][8]"));
+   _click(_checkbox("chkFields[][9]"));
+   _click(_checkbox("chkFields[][10]"));
+   _click(_checkbox("chkFields[][11]"));
+   _click(_checkbox("chkFields[][12]"));
+   _click(_image("plus.gif"));
+   _click(_button("Clear All[1]"));
+   _click(_checkbox("chkFields[][23]"));
+   _click(_checkbox("chkFields[][25]"));
+   _click(_checkbox("chkFields[][26]"));
+   _click(_checkbox("chkFields[][27]"));
+   _click(_checkbox("chkFields[][28]"));
+   _click(_checkbox("chkFields[][29]"));
+   _click(_button("Clear All[2]"));
+   _click(_button("Clear All[3]"));
+   _click(_submit("Save"));
+   
+   
+   _click(_link("Add search term"));
+   _click(_radio("rdoField[6]"));
+   _click(_submit("Select Field"));
+   _setValue(_textbox("txtCompValue"), "Female");
+   _click(_submit("Save search term"));
+   
+   
+   _click(_link("Add search term"));
+   _click(_div("scrollCB"));
+   _click(_radio("rdoField[22]"));
+   _click(_submit("Select Field"));
+   _setSelected(_select("ddlCompValue1"), "Yes");
+   _click(_submit("Save search term"));
+   
+   
+   _click(_link("Add search term"));
+   _click(_div("scrollCB"));
+   _click(_radio("rdoField[23]"));
+   _click(_submit("Select Field"));
+   _setSelected(_select("ddlCompareTo"), "Math/Science/Engineering");
+   _click(_submit("Save search term"));
+   
+   _click(_link("Add search term"));
+   _click(_div("scrollCB"));
+   _click(_radio("rdoField[23]"));
+   _click(_submit("Select Field"));
+   _setSelected(_select("ddlCompareTo"), "Agriculture");
+   _click(_submit("Save search term"));
+   
+   
+   _click(_link("Add search term"));
+   _click(_div("scrollCB"));
+   _click(_radio("rdoField[27]"));
+   _click(_submit("Select Field"));
+   _setSelected(_select("ddlCompare"), "On or After");
+   _setValue(_textbox("txtDate"), "9/1/2014");
+   _click(_submit("Save search term"));
+   
+   _click(_link("Add search term"));
+   _click(_div("scrollCB"));
+   _click(_radio("rdoField[25]"));
+   _click(_submit("Select Field"));
+   _setValue(_textbox("txtCompValue"), "Freedonia A&M");
+   _click(_submit("Save search term"));
+   
+   _click(_link("Add search term"));
+   _click(_div("scrollCB"));
+   _click(_radio("rdoField[26]"));
+   _click(_submit("Select Field"));
+   _setValue(_textbox("txtCompValue"), "Freedonia A&M");
+   _click(_submit("Save search term"));
+   
+   _click(_link("Run Report"));
+   _click(_div("attendTable"));
+   _assertExists(_cell("Ackers"));
+   _assert(_isVisible(_cell("Ackers")));
+   _assertEqual("Ackers", _getText(_cell("Ackers")));
+   _assertContainsText("Ackers", _cell("Ackers"));
+   _assertExists(_cell("Ackers"));
+   _assert(_isVisible(_cell("Ackers")));
+   _assertEqual("Ackers", _getText(_cell("Ackers")));
+   _assertContainsText("Ackers", _cell("Ackers"));
+   _assertExists(_cell("Ackers"));
+   _assert(_isVisible(_cell("Ackers")));
+   _assertEqual("Ackers", _getText(_cell("Ackers")));
+   _assertContainsText("Ackers", _cell("Ackers"));
+   _click(_image("View report record"));
+   
+      // Parentheses mismatch
+   _click(_link("Parentheses"));
+   _click(_textbox("idParenL_0_6"));
+   
+   
+   _setSelected(_select("idAndOrDDL_0"), "AND");
+   _setSelected(_select("idAndOrDDL_1"), "AND");
+   _setSelected(_select("idAndOrDDL_2"), "OR");
+   _setSelected(_select("idAndOrDDL_3"), "AND");
+   _setSelected(_select("idAndOrDDL_4"), "AND");
+   _setSelected(_select("idAndOrDDL_5"), "OR");
+   
+   
+   _click(_submit("Update"));
+   _assertExists(_div("Warning: the parentheses in this search expresssion are not balanced. You will not be able to run this report until the parenthese are balanced."));
+   _assert(_isVisible(_div("Warning: the parentheses in this search expresssion are not balanced. You will not be able to run this report until the parenthese are balanced.")));
+   _assertEqual("Warning: the parentheses in this search expresssion are not balanced. You will not be able to run this report until the parenthese are balanced.", _getText(_div("Warning: the parentheses in this search expresssion are not balanced. You will not be able to run this report until the parenthese are balanced.")));
+   _assertContainsText("Warning: the parentheses in this search expresssion are not balanced. You will not be able to run this report until the parenthese are balanced.", _div("Warning: the parentheses in this search expresssion are not balanced. You will not be able to run this report until the parenthese are balanced."));
+   _click(_link("Parentheses"));
+   
+   _click(_textbox("idParenL_0_1"));
+   _click(_textbox("idParenL_2_6"));
+   _click(_textbox("idParenR_3_1"));
+   
+   _click(_textbox("idParenL_5_6"));
+   _click(_textbox("idParenR_6_1"));
+
+   _click(_submit("Update"));
+   _click(_link("Run Report"));
+   
+      // these clients should be in the report
+   _assertExists(_cell("Ackers"));
+   _assert(_isVisible(_cell("Ackers")));
+   _assertExists(_cell("Ackers"));
+   _assert(_isVisible(_cell("Aliving")));
+   
+      // these clients should not be in the report
+   _assertNotTrue(_cell("Anderson"));
+   _assertNotTrue(_cell("Axelrod"));
+   _assertNotTrue(_cell("Gladys"));   
+}
+
+
+function buildCRptScholarship(){
+   _log("==> entering buildCRptScholarship");
+   createScholarshipCRpt();
+}

@@ -1,0 +1,25 @@
+The numbers used for the height/weight/BMI/OFC percentiles are based on the 
+World Health Organization's (WHO) growth charts for children.
+
+The tabular data was retreived from the WHO web site in August of 2010.
+
+Note that OFC stands for Occipitofrontal Circumference (head circumference). Lengths 
+are in centimeters, and weights are in kilograms. Please note that different charts
+apply to boys and girls.
+
+Since different tables use different granularities for age, all the ages were converted 
+to days, using the constant 1 months = 30.4368499 day.
+
+Source Documents
+================
+
+         BMI - Boys: http://www.who.int/childgrowth/standards/b_f_a_tables_p_boys/en/index.html
+        BMI - Girls: http://www.who.int/childgrowth/standards/b_f_a_tables_p_girls/en/index.html
+
+      Height/Length: http://www.who.int/childgrowth/standards/height_for_age/en/index.html
+             Weight: http://www.who.int/childgrowth/standards/weight_for_age/en/index.html
+
+                OFC: http://www.who.int/childgrowth/standards/hc_for_age/en/index.html
+
+- John Zimmerman
+11/7/2013

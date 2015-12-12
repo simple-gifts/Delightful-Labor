@@ -1,0 +1,132 @@
+
+
+function enrollStudentsAddAttend(){
+    _click(_link("client"));
+    _assertExists(_cell("Ackers, Alice"));
+    _assert(_isVisible(_cell("Ackers, Alice")));
+    _assertEqual("Ackers, Alice", _getText(_cell("Ackers, Alice")));
+    _assertContainsText("Ackers, Alice", _cell("Ackers, Alice"));
+    _assertExists(_cell("Ackers, Alice"));
+    _assert(_isVisible(_cell("Ackers, Alice")));
+    _assertEqual("Ackers, Alice", _getText(_cell("Ackers, Alice")));
+    _assertContainsText("Ackers, Alice", _cell("Ackers, Alice"));
+    _assertExists(_cell("Ackers, Alice"));
+    _assert(_isVisible(_cell("Ackers, Alice")));
+    _assertEqual("Ackers, Alice", _getText(_cell("Ackers, Alice")));
+    _assertContainsText("Ackers, Alice", _cell("Ackers, Alice"));
+    _click(_image("View client record"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    _click(_link("Enroll this client"));
+    _setValue(_textbox("txtEStart"), "1/1/2015");
+    _click(_checkbox("uf000003_000013"));
+    _setSelected(_select("uf000003_000014"), "High School");
+    _setSelected(_select("uf000003_000015[][0]"), ["Raindrops on Roses"]);
+    _setSelected(_select("uf000003_000015[][0]"), ["Raindrops on Roses","Fresh Apple Struedell"]);
+    _click(_submit("Save"));
+    _assertExists(_link("Add Attendance Record"));
+    _assert(_isVisible(_link("Add Attendance Record")));
+    _assertEqual("Add Attendance Record", _getText(_link("Add Attendance Record")));
+    _assertContainsText("Add Attendance Record", _link("Add Attendance Record"));
+    _click(_link("Add Attendance Record"));
+    _setValue(_textbox("txtADate"), "1/2/2015");
+    _setSelected(_select("ddlDuration"), "2 hours");
+    _setValue(_textarea("txtCaseNotes"), "Well behaved.");
+    _setSelected(_select("uf000004_000012"), "Tutoring");
+    _click(_submit("Save"));
+    _assertExists(_cell("Well behaved."));
+    _assert(_isVisible(_cell("Well behaved.")));
+    _assertEqual("Well behaved.", _getText(_cell("Well behaved.")));
+    _assertContainsText("Well behaved.", _cell("Well behaved."));
+    _assertExists(_cell("Well behaved."));
+    _assert(_isVisible(_cell("Well behaved.")));
+    _assertEqual("Well behaved.", _getText(_cell("Well behaved.")));
+    _assertContainsText("Well behaved.", _cell("Well behaved."));
+    _assertExists(_cell("Well behaved."));
+    _assert(_isVisible(_cell("Well behaved.")));
+    _assertEqual("Well behaved.", _getText(_cell("Well behaved.")));
+    _assertContainsText("Well behaved.", _cell("Well behaved."));
+    _click(_link("Clients"));
+    _click(_link("By Client Last Name[1]"));
+    _click(_image("View client record[1]"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    _click(_link("Enroll this client"));
+    _setValue(_textbox("txtEStart"), "12/12/2014");
+    _click(_checkbox("uf000003_000013"));
+    _setSelected(_select("uf000003_000014"), "High School");
+    _setSelected(_select("uf000003_000015[][0]"), ["Wiskers on Kittens","Warm Wollen Mittens"]);
+    _click(_submit("Save"));
+    _click(_link("Add Attendance Record"));
+    _setValue(_textbox("txtADate"), "12/22/2015");
+    _setSelected(_select("ddlDuration"), "3 hours");
+    _setValue(_textarea("txtCaseNotes"), "Had a good time.");
+    _setSelected(_select("uf000004_000012"), "Fun activities");
+    _click(_submit("Save"));
+    _assertExists(_image("Clone attendance record"));
+    _assert(_isVisible(_image("Clone attendance record")));
+    _click(_image("Clone attendance record"));
+    _setValue(_textbox("txtADate"), "2/10/2015");
+    _click(_checkbox("chkClient[]"));
+    _click(_checkbox("chkClient[][1]"));
+    _click(_submit("Clone"));
+    _assertExists(_div("The specified attendance record was cloned."));
+    _assert(_isVisible(_div("The specified attendance record was cloned.")));
+    _assertEqual("The specified attendance record was cloned.", _getText(_div("The specified attendance record was cloned.")));
+    _assertContainsText("The specified attendance record was cloned.", _div("The specified attendance record was cloned."));
+    _click(_image("View attendance[1]"));
+}
+
+function removeCPRecs(){
+/*
+ TRUNCATE TABLE  `uf_000003`;
+ TRUNCATE TABLE  `uf_000004`;
+*/
+    _click(_link("nb_d_c"));
+    _click(_link("ridx1"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    
+    _click(_image("View attendance records"));
+    _click(_image("Remove"));
+    _expectConfirm("Are you sure you want to remove this record? ", true);
+    _click(_image("Remove"));
+    _expectConfirm("Are you sure you want to remove this record? ", true);
+    _click(_link("Client Record"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    _click(_image("View enrollment record"));
+    _click(_link("Remove"));
+    _expectConfirm("Are you sure you want to remove this record? ", true);
+//    _click(_link("Remove"));
+    
+    _click(_link("nb_d_c"));
+    _click(_link("ridx2"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    _click(_image("View attendance records"));
+    _click(_image("Remove"));
+    _expectConfirm("Are you sure you want to remove this record? ", true);
+    _click(_image("Remove"));
+    _expectConfirm("Are you sure you want to remove this record? ", true);
+    _click(_link("Client Record"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    _click(_image("View enrollment record"));
+    _click(_link("Remove"));
+    _expectConfirm("Are you sure you want to remove this record? ", true);
+//    _click(_link("Remove"));
+    
+    _click(_link("Client Record"));
+    _click(_image("plus.gif"));
+    _click(_image("plus.gif"));
+    _assertExists(_span(17));
+    _assert(_isVisible(_span(17)));
+    _assertEqual(": Not enrolled. Enroll this client", _getText(_span(17)));
+    _assertContainsText(": Not enrolled. Enroll this client", _span(17));
+}
+
+function enrollClientProg($bRemoveRecs){
+   enrollStudentsAddAttend();
+   if ($bRemoveRecs) removeCPRecs();
+}

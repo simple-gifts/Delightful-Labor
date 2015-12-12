@@ -1,0 +1,111 @@
+
+function createSingleBizRec($strBizName,
+            $strAddr1, $strAddr2, $strCity, $strState, $strZip, $strCountry,
+            $strEmail, $strPhone, $strWebSite,
+            $strBizCat, $strACO){
+
+    _assertExists(_link("sponsor"));
+    _assert(_isVisible(_link("sponsor")));
+    _assertEqual("sponsor", _getText(_link("sponsor")));
+    _assertContainsText("sponsor", _link("sponsor"));
+
+    _click(_link("mb_b_ae"));
+    _setValue(_textbox("txtBizName"), $strBizName);
+    _setValue(_textbox("txtAddr1"),   $strAddr1);
+    _setValue(_textbox("txtAddr2"),   $strAddr2);
+    _setValue(_textbox("txtCity"),    $strCity);
+    _setValue(_textbox("txtState"),   $strState);
+    _setValue(_textbox("txtZip"),     $strZip);
+    _setValue(_textbox("txtCountry"), $strCountry);
+    _setValue(_textbox("txtEmail"),   $strEmail);
+
+    _setValue(_textbox("txtPhone"),   $strPhone);
+    _setValue(_textbox("txtWebSite"), $strWebSite);
+    _setSelected(_select("ddlBizCat"), $strBizCat);
+    _click(_radio($strACO));
+    _setSelected(_select("ddlAttrib"), "Staff Member");
+
+    _click(_submit("Add Business/Organization"));
+
+    _assertExists(_image("Edit business/organization information"));
+    _assertEqual($strBizName, _getText(_cell("safeBizName")));
+}
+
+function addBizContact($lBizID, $strBizName, $strContactSearch, $strSelectID, $strCompName){
+    _click(_link("nb_search_bz"));
+    _setValue(_textbox("txtSearch1"), $lBizID);
+    _click(_submit("Search[0]"));
+    _assertExists(_cell($strBizName));
+    
+    _click(_link("Add new contact"));
+    _setValue(_textbox("txtSearch"), $strContactSearch);
+    _click(_submit("Search"));
+    _click(_link($strSelectID));
+    
+    _setSelected(_select("ddlBizRel"), "Intern");
+    _click(_checkbox("chkSoft"));
+    _click(_submit("Save"));
+    _click(_image("plus.gif[1]"));
+    _assertExists(_cell($strCompName));
+    _assert(_isVisible(_cell($strCompName)));
+}
+
+function addBizGift(){
+    _click(_link("bus/org"));
+    _click(_link("New gift"));
+    _setValue(_textbox("txtAmount"), "2000.00");
+    _setSelected(_select("ddlAccount"), "Fund Raisers");
+    _setSelected(_select("ddlCamps"), "Fun Fest 2013");
+    _setValue(_textbox("txtCheck"), "98765");
+    _setSelected(_select("ddlPayType"), "Check");
+    _setSelected(_select("ddlGiftCat"), "Big Donors");
+    _setSelected(_select("ddlAttrib"), "Staff Member");
+    _setValue(_textbox("txtDDate"), "2/2/2015");
+    _click(_submit("Save"));
+    
+    _assertExists(_cell("\$ 2,000.00"));
+    _assert(_isVisible(_cell("\$ 2,000.00")));
+    _assertEqual("$ 2,000.00", _getText(_cell("\$ 2,000.00")));
+    _assertContainsText("$ 2,000.00", _cell("\$ 2,000.00"));
+    
+    _click(_link("Donor's gift history"));
+    _assertExists(_cell("2,000.00"));
+    _assert(_isVisible(_cell("2,000.00")));
+    _assertEqual("2,000.00", _getText(_cell("2,000.00")));
+    _assertContainsText("2,000.00", _cell("2,000.00"));
+    _assertExists(_cell("2,000.00"));
+    _assert(_isVisible(_cell("2,000.00")));
+    _assertEqual("2,000.00", _getText(_cell("2,000.00")));
+    _assertContainsText("2,000.00", _cell("2,000.00"));
+    _assertExists(_cell("2,000.00"));
+    _assert(_isVisible(_cell("2,000.00")));
+    _assertEqual("2,000.00", _getText(_cell("2,000.00")));
+    _assertContainsText("2,000.00", _cell("2,000.00"));
+    
+       // test soft-cash relationship
+    _assertExists(_cell("Applegate, Abner"));
+    _assert(_isVisible(_cell("Applegate, Abner")));
+}
+
+function addBizRecs($strLoginPath){
+    _log("==> entering addBizRecs");
+    setPathToDLTest($strLoginPath);
+    logIn("admin", "admin");
+
+       // aco: 0 - US, 1 - Canada, 2 - Euro, 3 - Mexico
+    createSingleBizRec("Acres of Anchovies", "123 Wacky Way", "", "Austin", "TX", "78777", "US",
+            "sally@test.com", "555-1212", "test.com",
+            "Media", "rdoACO[1]");
+
+    createSingleBizRec("Acorn Estates", "432 Wanda June Blvd", "Suite A-101", "Austin", "TX", "78222", "US",
+            "betty@test.com", "555-1212 x2", "test.com",
+            "Media", "rdoACO[0]");
+            
+    addBizContact(7, "Acorn Estates", "a", "sID_1", "Applegate, Mr. Abner P. (Ab)");
+
+    addBizGift();
+    
+    signOut();
+}
+
+

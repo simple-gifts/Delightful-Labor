@@ -1,0 +1,18 @@
+span.formErrorInstall{
+   color: #ff0000;
+   padding: 1px;
+   border: 1px solid #f00;
+   background-color: #ffdddd;
+   font-size: 9pt;
+   display: inline-block;
+   width: 350px; 
+}
+.formInstallError{
+   color: #ff0000;
+   padding: 3px;
+   border: 1px solid #f00;
+   width: 400px; 
+   background-color: #ffdddd;
+   font-size: 9pt;
+   margin: 2px 0px 2px 0px;
+}

@@ -1,0 +1,79 @@
+
+function addICategories(){
+    _assertExists(_link("more"));
+    _assert(_isVisible(_link("more")));
+    _assertEqual("more", _getText(_link("more")));
+    _assertContainsText("more", _link("more"));
+    
+    _click(_link("nb_more_home"));
+    _click(_link("Categories[2]"));
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "Computers");
+    _setValue(_textarea("txtNotes"), "My notes");
+    _click(_submit("Save"));
+    
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "Lap tops");
+    _setSelected(_select("ddlParent"), "Computers");
+    _click(_submit("Save"));
+    
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "Desktops");
+    _click(_submit("Save"));
+    
+    _click(_image("Edit inventory category[2]"));
+    _setSelected(_select("ddlParent"), "Computers");
+    _click(_submit("Save"));
+    
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "Desktops");
+    _setSelected(_select("ddlParent"), "Computers");
+    _click(_submit("Save"));
+    
+    _click(_image("Remove inventory category[1]"));
+    _expectConfirm("Are you sure you want to remove this inventory category?.", true);
+    
+    _assertExists(_cell("|\u2014 Desktops"));
+    _assert(_isVisible(_cell("|\u2014 Desktops")));
+    _assertEqual("|\u2014 Desktops", _getText(_cell("|\u2014 Desktops")));
+    _assertContainsText("|\u2014 Desktops", _cell("|\u2014 Desktops"));
+    
+    _click(_link("Add new inventory category"));    
+    _setValue(_textbox("txtCat"), "Keys");
+    _click(_submit("Save"));
+    
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "Main Office");
+    _setSelected(_select("ddlParent"), "Keys");
+    _click(_submit("Save"));
+    
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "School");
+    _setSelected(_select("ddlParent"), "Keys");
+    _click(_submit("Save"));
+    
+    _click(_link("Add new inventory category"));
+    _setValue(_textbox("txtCat"), "Classrooms");
+    _setSelected(_select("ddlParent"), "|\u2014 School");
+    _click(_submit("Save"));
+    
+    _assertExists(_cell("|\u2014 |\u2014 Classrooms"));
+    _assert(_isVisible(_cell("|\u2014 |\u2014 Classrooms")));
+    _assertEqual("|\u2014 |\u2014 Classrooms", _getText(_cell("|\u2014 |\u2014 Classrooms")));
+    _assertContainsText("|\u2014 |\u2014 Classrooms", _cell("|\u2014 |\u2014 Classrooms"));
+    _click(_link("Add new inventory category"));
+    
+    _setValue(_textbox("txtCat"), "Gym");
+    _setSelected(_select("ddlParent"), "|\u2014 School");
+    _click(_submit("Save"));
+}
+
+function buildInventory(){
+    _log("==> entering buildInventory");
+
+    addICategories();
+
+}
+
+
+

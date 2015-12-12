@@ -1,0 +1,114 @@
+_include("../utilities/util_01.sah");
+
+
+function createUserAcctSally(){
+    _log("==> entering createUserAcctSally");
+    
+    _click(_link("Accounts Directory"));
+    _assertExists(_link("Add new user"));
+    _assert(_isVisible(_link("Add new user")));
+    _assertEqual("Add new user", _getText(_link("Add new user")));
+    _assertContainsText("Add new user", _link("Add new user"));
+    _click(_link("Add new user"));
+    _assertExists(_textbox("txtFName"));
+    _assert(_isVisible(_textbox("txtFName")));
+    _assertEqual("", _getValue(_textbox("txtFName")));
+    _click(_cell(1));
+    _setValue(_textbox("txtFName"), "Sally");
+    _setValue(_textbox("txtLName"), "The Intern");
+    _setValue(_textbox("txtUN"), "sally");
+    _setValue(_password("txtPWord1"), "sallyMay");
+    _setValue(_password("txtPWord2"), "sallyMay");
+    _click(_radio("rdoDateFormat"));
+    _click(_radio("rdoMeasureFormat"));
+    _click(_checkbox("chkUserDataEntryPeople"));
+    _click(_cell("enpView[9]"));
+    _click(_checkbox("chkUserDataEntryGifts"));
+    _click(_checkbox("chkUserEditPeople"));
+    _click(_checkbox("chkUserEditGifts"));
+    _click(_checkbox("chkUserViewPeople"));
+    _click(_checkbox("chkUserViewGiftHistory"));
+    _click(_checkbox("chkUserViewReports"));
+    _click(_checkbox("chkUserAllowExports"));
+    _click(_checkbox("chkUserAllowAuctions"));
+    _click(_checkbox("chkUserAllowInventory"));
+    _click(_checkbox("chkUserAllowGrants"));
+    _click(_checkbox("chkUserAllowSponsorship"));
+    _click(_checkbox("chkUserAllowSponFinancial"));
+    _click(_checkbox("chkUserAllowClient"));
+    _setValue(_textbox("txtEmail"), "sally@delightfullabor.com");
+    _click(_submit("Submit"));
+    _assertExists(_image("Edit user record"));
+    _assert(_isVisible(_image("Edit user record")));
+    _click(_cell(1));
+    _click(_image("Edit user record"));
+    _assertExists(_checkbox("chkUserDataEntryPeople"));
+    _assert(_isVisible(_checkbox("chkUserDataEntryPeople")));
+    _assert(_checkbox("chkUserDataEntryPeople").checked);
+    _click(_cell("enpView[9]"));
+    _setValue(_textbox("txtAddr1"), "123 Pine St.");
+    _setValue(_textbox("txtAddr2"), "Apt. 3G");
+    _setValue(_textbox("txtCity"), "Austin");
+    _setValue(_textbox("txtState"), "Tx");
+    _setValue(_textbox("txtCountry"), "US");
+    _setValue(_textbox("txtZip"), "78123");
+    _setValue(_textbox("txtPhone"), "555-1212");
+    _setValue(_textbox("txtCell"), "555-cell");
+    _click(_submit("Submit"));
+    _assertExists(_cell("555-cell"));
+    _assert(_isVisible(_cell("555-cell")));
+    _assertEqual("555-cell", _getText(_cell("555-cell")));
+    _assertContainsText("555-cell", _cell("555-cell"));
+    _assertExists(_cell("555-cell"));
+    _assert(_isVisible(_cell("555-cell")));
+    _assertEqual("555-cell", _getText(_cell("555-cell")));
+    _assertContainsText("555-cell", _cell("555-cell"));
+    _assertExists(_cell("555-cell"));
+    _assert(_isVisible(_cell("555-cell")));
+    _assertEqual("555-cell", _getText(_cell("555-cell")));
+    _assertContainsText("555-cell", _cell("555-cell"));
+    _click(_cell(1));
+}
+
+function logInAsSally(){
+    _log("==> entering logInAsSally");
+    
+    _click(_link("Your Profile and Preferences"));
+    _assertExists(_cell("sally"));
+    _assert(_isVisible(_cell("sally")));
+    _assertEqual("sally", _getText(_cell("sally")));
+    _assertContainsText("sally", _cell("sally"));
+    _assertExists(_cell("sally"));
+    _assert(_isVisible(_cell("sally")));
+    _assertEqual("sally", _getText(_cell("sally")));
+    _assertContainsText("sally", _cell("sally"));
+    _assertExists(_cell("sally"));
+    _assert(_isVisible(_cell("sally")));
+    _assertEqual("sally", _getText(_cell("sally")));
+    _assertContainsText("sally", _cell("sally"));
+    _click(_cell(1));
+}
+
+function testNoAcctName(){
+    _click(_link("Your Profile and Preferences"));
+    _click(_image("Edit your account record"));
+    _setValue(_textbox("txtUN"), "");
+    _click(_submit("Submit"));
+    _assertExists(_div("The User Name field is required."));
+    _assert(_isVisible(_div("The User Name field is required.")));
+    _assertEqual("The User Name field is required.", _getText(_div("The User Name field is required.")));
+    _assertContainsText("The User Name field is required.", _div("The User Name field is required."));
+    _click(_cell(1));
+}
+
+function createSallyAcct(){
+    setPathToDLTest($strLoginPath);
+    logIn("admin", "admin");
+    createUserAcctSally();
+    signOut();
+    
+    logIn("sally", "sallyMay");
+    logInAsSally();
+    testNoAcctName();
+    signOut();
+}

@@ -1,0 +1,48 @@
+_include("../utilities/util_01.sah");
+
+function createDatabase($strHost, $strDBName, $strUser, $strPWord){
+    _log("==> entering createDatabase");
+    _setValue(_textbox("dbHostName"), $strHost);
+    _setValue(_textbox("dbName"), $strDBName);
+    _setValue(_textbox("dbUserName"), $strUser);
+    _setValue(_password("dbPassword"), $strPWord);
+    _click(_submit("Install"));
+    _assertExists(_link("Click here to log in."));
+    _assert(_isVisible(_link("Click here to log in.")));
+}
+
+function logInTest(){
+    _log("==> entering logInTest");
+    _assertEqual("Click here to log in.", _getText(_link("Click here to log in.")));
+    _assertContainsText("Click here to log in.", _link("Click here to log in."));
+    _click(_div("Database Installation Complete! Click here to log in."));
+    _click(_link("Click here to log in."));
+    _setValue(_textbox("username"), "admin");
+    _setValue(_password("password"), "admin");
+    _click(_submit("Log In"));
+    _assertExists(_link("here."));
+    _assert(_isVisible(_link("here.")));
+    _assertEqual("here.", _getText(_link("here.")));
+    _assertContainsText("here.", _link("here."));
+    _click(_listItem("dropdown-vertical-rtl dir[2]"));
+}
+
+function logOutAfterInstall(){
+    _log("==> entering logOutAfterInstall");
+    _click(_link("Sign Out"));
+    _assertExists(_textbox("username"));
+    _assert(_isVisible(_textbox("username")));
+    _assertEqual("", _getValue(_textbox("username")));
+}
+
+function cleanInstall($strInstallPath, $bSFTest){
+    _log("==> entering cleanInstall");
+    setPathToDLTest($strInstallPath);
+    if ($bSFTest){
+       createDatabase("localhost", "dbaustin_dl_sftest", "dbaustin_sftest", "sftest2001");
+    }else {
+       createDatabase("localhost", "dl_test", "bigGuy", "mypassword");
+    }
+    logInTest();
+    logOutAfterInstall();
+}

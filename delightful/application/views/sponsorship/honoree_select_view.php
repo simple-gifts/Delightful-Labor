@@ -1,0 +1,4 @@
+<?php
+
+echoT($strHTMLSearchResults);
+
