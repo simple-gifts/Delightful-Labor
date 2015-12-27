@@ -1,8 +1,8 @@
 <?php
 //   echoT(strImageLink('admin/alists_generic/addEdit/'.$strListType.'/0', '', true,
 //                      true, IMGLINK_ADDNEW, 'Add New '.$xlateListType).'<br><br>');
-   echoT(strLinkAdd_GenericListItem($strListType, 'Add New '.$xlateListType, true).' '
-        .strLinkAdd_GenericListItem($strListType, 'Add New '.$xlateListType, false).'<br><br>');
+   echoT(strLinkAdd_GenericListItem($strListType, 'Add New '.$xlateListType, true,  'id="addNewItemI"').' '
+        .strLinkAdd_GenericListItem($strListType, 'Add New '.$xlateListType, false, 'id="addNewItemL"').'<br><br>');
 
    if ($lNumInList == 0){
       echoT($listEmptyLabel);

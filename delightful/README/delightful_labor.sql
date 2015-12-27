@@ -280,7 +280,8 @@ INSERT INTO `admin_version` (`av_lKeyID`, `av_sngVersion`, `av_strVersionNotes`)
 (13, '1.009', 'Upgrade'),
 (14, '1.010', 'Inventory Management'),
 (15, '1.011', 'Custom Reports'),
-(16, '1.012', 'Vol. Job Codes')
+(16, '1.012', 'Vol. Job Codes'),
+(17, '1.013', 'Enhanced volunteer registration')
 ;
 
 # [BREAK]

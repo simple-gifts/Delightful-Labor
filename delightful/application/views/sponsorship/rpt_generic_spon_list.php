@@ -66,7 +66,7 @@
       if ($showFields->bSponID){
          echoT('
              <td class="enpRpt" style="'.$strIStyle.'">'
-                .strLinkView_Sponsorship($lSponsorID, 'View sponsorship record', true).'&nbsp;'
+                .strLinkView_Sponsorship($lSponsorID, 'View sponsorship record', true, 'id="viewSponRec_'.$lSponsorID.'"').'&nbsp;'
                 .str_pad($lSponsorID, 5, '0', STR_PAD_LEFT).'
              </td>');
       }

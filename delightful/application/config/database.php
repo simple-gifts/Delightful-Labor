@@ -1,12 +1,32 @@
 <?php
 /* ----------------------------
-  Database configuration entries updated on 2015-04-18 00:52:06 for the 
+  Database configuration entries updated on 2015-12-19 23:25:51 for the 
   Delightful Labor installation. 
 
   Updates can be found at the bottom of this file.
  ----------------------------*/
-?>
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+?><?php
+/* ----------------------------
+  Database configuration entries updated on 2015-12-18 18:32:26 for the 
+  Delightful Labor installation. 
+
+  Updates can be found at the bottom of this file.
+ ----------------------------*/
+?><?php
+/* ----------------------------
+  Database configuration entries updated on 2015-12-18 18:03:07 for the 
+  Delightful Labor installation. 
+
+  Updates can be found at the bottom of this file.
+ ----------------------------*/
+?><?php
+/* ----------------------------
+  Database configuration entries updated on 2015-12-18 17:53:41 for the 
+  Delightful Labor installation. 
+
+  Updates can be found at the bottom of this file.
+ ----------------------------*/
+?><?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
 
 /*
 | -------------------------------------------------------------------
@@ -87,6 +107,13 @@ $db['default']['stricton'] = FALSE;
 /* Location: ./application/config/database.php */
 
 
+/* ----------------------------
+  Delightful Labor database settings. 
+ ----------------------------*/
+$db['default']['hostname'] = 'localhost';
+$db['default']['username'] = 'bigGuy';
+$db['default']['password'] = 'mypassword';
+$db['default']['database'] = 'dl_test';
 
 
 /* ----------------------------
@@ -95,4 +122,22 @@ $db['default']['stricton'] = FALSE;
 $db['default']['hostname'] = 'localhost';
 $db['default']['username'] = 'bigGuy';
 $db['default']['password'] = 'mypassword';
-$db['default']['database'] = 'dl_girls_fly_2';
+$db['default']['database'] = 'dl_test';
+
+
+/* ----------------------------
+  Delightful Labor database settings. 
+ ----------------------------*/
+$db['default']['hostname'] = 'localhost';
+$db['default']['username'] = 'bigGuy';
+$db['default']['password'] = 'mypassword';
+$db['default']['database'] = 'dl_test';
+
+
+/* ----------------------------
+  Delightful Labor database settings. 
+ ----------------------------*/
+$db['default']['hostname'] = 'localhost';
+$db['default']['username'] = 'bigGuy';
+$db['default']['password'] = 'mypassword';
+$db['default']['database'] = 'dl_test';

@@ -23,8 +23,8 @@ function showSponsorshipInfo($clsRpt, $sponInfo, $lNumSponsors, $lPID, $clsSpon)
    $attributes->divID        = 'allSponSumDiv';
    $attributes->divImageID   = 'allSponSumDivImg';
    openBlock('Sponsorship <span style="font-size: 9pt;"> ('.$lNumSponsors.')</span>',
-               strLinkAdd_Sponsorship($lPID, 'Add new sponsorship', true).' '
-              .strLinkAdd_Sponsorship($lPID, 'Add new sponsorship', false), $attributes);
+               strLinkAdd_Sponsorship($lPID, 'Add new sponsorship', true,  'id="addNewSponI"').' '
+              .strLinkAdd_Sponsorship($lPID, 'Add new sponsorship', false, 'id="addNewSponL"'), $attributes);
 
    if ($lNumSponsors == 0){
       echoT('<i>(no sponsorships)</i><br>');
@@ -39,10 +39,12 @@ function showSponsorshipInfo($clsRpt, $sponInfo, $lNumSponsors, $lPID, $clsSpon)
             $strActiveStyle = '';
             $strInactive = '';
          }
+         $lSponsorID = $spon->lKeyID;
+         $lClientID  = $spon->lClientID;
          echoT('
                 <tr>
                    <td style="'.$strActiveStyle.'">'
-                      .strLinkView_Sponsorship($spon->lKeyID, 'view sponsorship', true).' '
+                      .strLinkView_Sponsorship($lSponsorID, 'view sponsorship', true, 'id="viewSponRec_'.$lSponsorID.'"').' '
                       .str_pad($spon->lKeyID, 5, '0', STR_PAD_LEFT).'
                    </td>
                    <td style="'.$strActiveStyle.'">'
@@ -50,11 +52,11 @@ function showSponsorshipInfo($clsRpt, $sponInfo, $lNumSponsors, $lPID, $clsSpon)
                    </td>
                    <td style="'.$strActiveStyle.'">');
 
-         if (is_null($spon->lClientID)){
+         if (is_null($lClientID)){
             echoT('<i>Client not set</i>');
          }else {
             echoT(
-               strLinkView_ClientRecord($spon->lClientID, 'View client record', true).' '
+               strLinkView_ClientRecord($lClientID, 'View client record', true, 'id="viewClientRec_'.$lClientID.'"').' '
               .$spon->strClientSafeNameFL.' ('.htmlspecialchars($spon->strLocation).')');
          }
          echoT($strInactive.'

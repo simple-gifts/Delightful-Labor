@@ -16,17 +16,17 @@ function strDisplayDirectory($strLinkBase,       $strClassExtra, $strMatchAlpha,
    $strOut = '';
    $strMatchAlpha = strtoupper($strMatchAlpha);
    $strOut .= strDisplayDirSingleChar(
-                   $strLinkBase, $strMatchAlpha, '*', $strClassExtra.' title="Show All" ',
-                   $bIncludeRecLimits, $lStart, $lPerPage).'&nbsp;&nbsp;&nbsp;'
+                   $strLinkBase, $strMatchAlpha, '*', $strClassExtra.' title="Show All" id="dirShowAll" ',
+                   $bIncludeRecLimits, $lStart, $lPerPage)."\n".'&nbsp;&nbsp;&nbsp;'
              .strDisplayDirSingleChar(
-                   $strLinkBase, $strMatchAlpha, '#', $strClassExtra.' title="Names that start with a non-alphabetic character" ',
-                   $bIncludeRecLimits, $lStart, $lPerPage);
-   $strOut .= '&nbsp;&nbsp;&nbsp;&nbsp;';
+                   $strLinkBase, $strMatchAlpha, '#', $strClassExtra.' title="Names that start with a non-alphabetic character" id="dirShowNonA" ',
+                   $bIncludeRecLimits, $lStart, $lPerPage)."\n";
+   $strOut .= '&nbsp;&nbsp;&nbsp;&nbsp;'."\n";
    for ($idx=65; $idx<=90; ++$idx){
       $strAlpha = chr($idx);
       $strOut .= strDisplayDirSingleChar(
-                      $strLinkBase, $strMatchAlpha, $strAlpha, $strClassExtra,
-                      $bIncludeRecLimits, 0, $lPerPage);
+                      $strLinkBase, $strMatchAlpha, $strAlpha, $strClassExtra.' id="dirAlpha_'.$strAlpha.'" ',
+                      $bIncludeRecLimits, 0, $lPerPage)."\n";
    }
    return($strOut.$strExtra);
 }

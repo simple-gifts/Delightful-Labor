@@ -32,16 +32,16 @@
          <li style="margin-top: 8px;"><b>Clients</b>
             <ul>
                <li style="margin-top: 2px;">'
-                  .anchor('admin/admin_special_lists/clients/locationView', 'Client Locations').'
+                  .anchor('admin/admin_special_lists/clients/locationView', 'Client Locations', 'id="clientLoc"').'
                </li>
                <li style="margin-top: 2px;">'
-                  .anchor('admin/admin_special_lists/clients/statCatView', 'Client Status Categories').'
+                  .anchor('admin/admin_special_lists/clients/statCatView', 'Client Status Categories', 'id="clientStatCat"').'
                </li>
                <li style="margin-top: 2px;">'
-                  .anchor('admin/alists_generic/view/'.CENUM_LISTTYPE_CPREPOSTCAT, 'Client Pre/Post Test Categories').'
+                  .anchor('admin/alists_generic/view/'.CENUM_LISTTYPE_CPREPOSTCAT, 'Client Pre/Post Test Categories', 'id="clientPrePost"').'
                </li>
                <li style="margin-top: 2px;">'
-                  .anchor('admin/admin_special_lists/clients/vocView', 'Client Vocabulary').'
+                  .anchor('admin/admin_special_lists/clients/vocView', 'Client Vocabulary', 'id="clientVoc"').'
                </li>
             </ul>
          </li>');
@@ -158,7 +158,8 @@
 
             <ul>
                <li style="margin-top: 2px;">'
-                  .anchor('admin/alists_generic/view/'.CENUM_LISTTYPE_VOLSKILLS, htmlspecialchars($gclsChapterVoc->vocJobSkills)).'
+                  .anchor('admin/alists_generic/view/'.CENUM_LISTTYPE_VOLSKILLS, 
+                          htmlspecialchars($gclsChapterVoc->vocJobSkills), 'id="listJobSkills"').'
                </li>
             </ul>
             

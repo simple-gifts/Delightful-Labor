@@ -13,7 +13,6 @@ class vol extends CI_Controller {
       setVolRegGlobals($this->clsACO, $this->clsChapter);
    }
 
-
    function register($strHash){
    //---------------------------------------------------------------------
    //
@@ -234,7 +233,7 @@ class vol extends CI_Controller {
          $displayData['errMessages'] = arrayCopy($gErrMessages);
          $this->load->vars($displayData);
          $this->load->view('vol_reg/register');
-      }else {
+      }else {         
          $this->saveVolReg($rRec, $lNumTables, $utables, $lNumSkills, $jobSkills, $bCreateAcct);
          redirect('vol_reg/vol/submitted/'.$strHash);
       }
@@ -602,7 +601,7 @@ class vol extends CI_Controller {
              .'You have been registered for <b>'.htmlspecialchars($regForm->strFormName).'</b><br><br>'
              .'Here are the details:<br>'
              .$strRegHTML
-             .'Please contact the volunteer coordinator at '.htmlspecialchars($strChapter).' if you have any questions.';
+             .'Please contact '.htmlspecialchars($rRec->strContactEmail).' with any questions or updates to your information.';
          $message .= "</body></html>";
          @mail($to, $subject, $message, $headers);      
       }
