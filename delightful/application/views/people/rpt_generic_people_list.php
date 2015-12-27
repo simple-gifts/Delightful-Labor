@@ -51,7 +51,7 @@
                //--------------------            
             if ($showFields->bPeopleID){
                echoT($clsRpt->writeCell(
-                                  strLinkView_PeopleRecord($lPID, 'View people record', true)
+                                  strLinkView_PeopleRecord($lPID, 'View people record', true, 'id="viewPRecI_'.$lPID.'"')
                                  .'&nbsp;'.str_pad($lPID, 5, '0', STR_PAD_LEFT)
                                  , 60)
                                  );
@@ -128,8 +128,8 @@
                // Sponsorship
                //--------------------
             if ($showFields->bSponsor){
-               $strLinkAddNew = strLinkAdd_Sponsorship($lPID, 'Add new sponsorship', true).'&nbsp;'
-                               .strLinkAdd_Sponsorship($lPID, 'Add new', false);
+               $strLinkAddNew = strLinkAdd_Sponsorship($lPID, 'Add new sponsorship', true, 'id="addSponI_'.$lPID.'"').'&nbsp;'
+                               .strLinkAdd_Sponsorship($lPID, 'Add new', false, 'id="addSponL_'.$lPID.'"');
                $strSponSum = $clsSpon->strSponsorSumLiteViaPID($lPID);
                if ($strSponSum=='n/a'){
                   $strStyle = ' text-align: center; color: #b0b0b0;';

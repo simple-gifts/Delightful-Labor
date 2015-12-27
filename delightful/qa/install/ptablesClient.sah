@@ -1,5 +1,0 @@
-_setValue(_textbox("username"), "admin");
-_setValue(_password("password"), "admin");
-_click(_link("admin"));
-_click(_listItem("Lists[1]"));
-_click(_link("Sign Out"));

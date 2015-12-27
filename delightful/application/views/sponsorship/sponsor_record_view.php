@@ -164,7 +164,7 @@ function showSponInfo(&$clsRpt, &$sponRec, $lSponID, $bInactive){
          
          .$clsRpt->openRow   ()
          .$clsRpt->writeLabel('Sponsor ID:')
-         .$clsRpt->writeCell (str_pad($lSponID, 5, '0', STR_PAD_LEFT))
+         .$clsRpt->writeCell (str_pad($lSponID, 5, '0', STR_PAD_LEFT), '', '', 1, 1, 'id="sponID"')
          .$clsRpt->closeRow  ());
 
       //----------------------

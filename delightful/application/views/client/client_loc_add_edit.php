@@ -45,7 +45,7 @@
       $lSPID = $clsProg->lKeyID;      
 
       echoT('
-         <input type="checkbox" name="chkSponProgs[]" value="'.$lSPID.'" '
+         <input type="checkbox" name="chkSponProgs[]" value="'.$lSPID.'" id="chkSP_'.$lSPID.'" '
                 .$progInUse[$lSPID].' '
                 .'value="TRUE">'.htmlspecialchars($clsProg->strProg).'<br>');               
    }

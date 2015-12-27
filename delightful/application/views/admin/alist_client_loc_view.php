@@ -54,7 +54,7 @@
       echoT('
               <tr class="makeStripe">
                  <td class="enpRpt" style="text-align: center; width: 60pt;">'
-                    .strLinkView_ClientLocation($lCLID, 'View client location', true).' '
+                    .strLinkView_ClientLocation($lCLID, 'View client location', true, 'id="cLocView_'.$lCLID.'"').' '
                     .str_pad($lCLID, 5, '0', STR_PAD_LEFT).'
                  </td>
                  <td class="enpRpt" style="text-align: center; width: 18pt;">'

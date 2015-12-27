@@ -613,8 +613,8 @@ if ($gbDev){
          $strOut .=
            '<li class="dir">Accounting Features
                <ul>
-                  <li>'.anchor('sponsors/auto_charge/applyChargesOpts',   'Apply Charges').'</li>
-                  <li>'.anchor('sponsors/batch_payments/batchSelectOpts', 'Batch Payments').'</li>
+                  <li>'.anchor('sponsors/auto_charge/applyChargesOpts',   'Apply Charges',  'id="mb_sponApplyCharges"').'</li>
+                  <li>'.anchor('sponsors/batch_payments/batchSelectOpts', 'Batch Payments', 'id="mb_sponBatchPay"').'</li>
                </ul>
             </li>';
       }
@@ -622,7 +622,7 @@ if ($gbDev){
          //---------------------------------------
          // Sponsorship => Directories
          //---------------------------------------
-      $strOut .= '<li>'.anchor('sponsors/spon_directory/view/false/-1/A/0/50', 'Directory').'</li>';
+      $strOut .= '<li>'.anchor('sponsors/spon_directory/view/false/-1/A/0/50', 'Directory',  'id="mb_sponDir"').'</li>';
 
          //---------------------------------------
          // Sponsorship => Searches

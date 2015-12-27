@@ -84,7 +84,7 @@
             echoT($clsRpt->writeCell($lRowIDX, '', 'text-align: center;'));
             if ($showFields->bClientID){
                echoT($clsRpt->writeCell(
-                                  strLinkView_ClientRecord($lClientID, 'View client record', true, ' id="ridx'.$lRowIDX.'" ')
+                                  strLinkView_ClientRecord($lClientID, 'View client record', true, ' id="dirCID_'.$lClientID.'" ')
                                  .'&nbsp;'.str_pad($lClientID, 5, '0', STR_PAD_LEFT), 60, 
                                  $strStyleActive));
             }

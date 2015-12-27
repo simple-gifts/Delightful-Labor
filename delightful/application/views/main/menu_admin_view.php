@@ -29,7 +29,7 @@
    echoT('
         <b>Your Organization:</b>
            <ul style="margin-top: 4pt;">
-             <li>'.anchor('admin/org/orgView',                              'Organization Record').'</li>
+             <li>'.anchor('admin/org/orgView',                            'Organization Record').'</li>
              <li>'.anchor('admin/timesheets/view_tst_record/viewTSTList', 'Staff Time Sheet Templates').'</li>
            </ul>');
 

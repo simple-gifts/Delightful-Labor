@@ -1026,7 +1026,7 @@ whereAmI(); die;
 
          case 'Select Link':
             $strCell = strImageLink($this->dir->clsSelLink->strLinkPath.'/'.$client->lKeyID,
-                                    $this->dir->clsSelLink->strAnchorExtra,
+                                    $this->dir->clsSelLink->strAnchorExtra.' id="selCID_'.$client->lKeyID.'" ',
                                     $this->dir->clsSelLink->bShowImage,
                                     $this->dir->clsSelLink->bShowText,
                                     $this->dir->clsSelLink->enumImage,

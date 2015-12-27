@@ -91,7 +91,7 @@
          foreach ($clsSponProg->sponProgs as $clsLocSP){
             $lSCID = $clsLocSP->lKeyID;
             echoT('
-               <input type="checkbox" name="chkSP[]" value="'.$lSCID.'" '
+               <input type="checkbox" name="chkSP[]" value="'.$lSCID.'"  id="chkSP_'.$lSCID.'" '
                      .(@$clsLocSP->bSupported ? 'checked' : '')
                      .' >'
                      .htmlspecialchars($clsLocSP->strProg).'<br>');

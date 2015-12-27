@@ -1,2 +1,0 @@
-_click(_image("View business record"));
-_click(_cell(1));

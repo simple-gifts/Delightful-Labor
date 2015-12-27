@@ -7,7 +7,8 @@
    foreach ($autoCharges12Mo as $clsMoCharge){
       if (is_null($clsMoCharge->lKeyID)){
          $strLabel = '<i>Charges not applied</i>';
-         $strLink = strLinkAdd_SponsorAutoCharges($clsMoCharge->lMonth, $clsMoCharge->lYear, 'Apply Charges', true);
+         $strLink = strLinkAdd_SponsorAutoCharges($clsMoCharge->lMonth, $clsMoCharge->lYear, 
+                     'Apply Charges', true, 'id="charge_'.$clsMoCharge->lYear.'_'.$clsMoCharge->lMonth.'"');
       }else {
          $strLabel = 'Charges applied on '.date($genumDateFormat, $clsMoCharge->dteOrigin)
                     .' by '.$clsMoCharge->strUserSafe;

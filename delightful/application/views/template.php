@@ -121,7 +121,7 @@ base_url = '<?php echo base_url();?>';
          echo('<div class="error">'.$this->session->flashdata('error').'</div>');
       }
        if ($this->session->flashdata('msg')){
-         echo('<div class="message">'.$this->session->flashdata('msg').'</div>');
+         echo('<div id="tempMsg" class="message">'.$this->session->flashdata('msg').'</div>');
       }
       if (isset($strFormDataEntryAlert)){
          if ($strFormDataEntryAlert != ''){
