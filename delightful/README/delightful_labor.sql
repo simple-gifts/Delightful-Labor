@@ -1,13 +1,13 @@
 # -------------------------------------------------------------------
 #  Delightful Labor
 #
-#  copyright (c) 2012-2015 by Database Austin
+#  copyright (c) 2012-2016 by Database Austin
 #  Austin, Texas
 #
 #  This software is provided under the GPL.
 #  Please see http://www.gnu.org/copyleft/gpl.html for details.
 #
-#  Delightful Labor sql version 1.013 2015-12-31
+#  Delightful Labor sql version 1.014 2016-01-15
 # --------------------------------------------------------------------
 
 
@@ -281,7 +281,8 @@ INSERT INTO `admin_version` (`av_lKeyID`, `av_sngVersion`, `av_strVersionNotes`)
 (14, '1.010', 'Inventory Management'),
 (15, '1.011', 'Custom Reports'),
 (16, '1.012', 'Vol. Job Codes'),
-(17, '1.013', 'Enhanced volunteer registration')
+(17, '1.013', 'Enhanced volunteer registration'),
+(18, '1.014', 'Enhanced importing features')
 ;
 
 # [BREAK]
@@ -397,6 +398,7 @@ CREATE TABLE `client_records` (
   `cr_strBio`              text NOT NULL,
   `cr_bNoLongerAtLocation` tinyint(1) NOT NULL DEFAULT '0',
   `cr_lAttributedTo`       int(11) DEFAULT NULL,
+  `cr_strImportID`         varchar(40) DEFAULT NULL,  
   `cr_bRetired`            tinyint(1) NOT NULL DEFAULT '0',
   `cr_lOriginID`           int(11)    NOT NULL DEFAULT '0',
   `cr_lLastUpdateID`       int(11)    NOT NULL DEFAULT '0',
@@ -1616,7 +1618,8 @@ DROP TABLE IF EXISTS import_log;
 
 CREATE TABLE `import_log` (
   `il_lKeyID`         int(11) NOT NULL AUTO_INCREMENT,
-  `il_enumImportType` enum('people','business','gift','sponsorPayment') DEFAULT NULL,
+  `il_enumImportType` enum('people','business','gift','sponsorPayment','personalizedTable','client') DEFAULT NULL,
+  `il_lUTableID`      int(11) DEFAULT NULL COMMENT 'Foreign key to uf_tables (for ptable imports only)',  
   `il_bRetired`       tinyint(1) NOT NULL DEFAULT '0',
   `il_lOriginID`      int(11) NOT NULL DEFAULT '0',
   `il_dteOrigin`      datetime NOT NULL DEFAULT '0000-00-00 00:00:00',

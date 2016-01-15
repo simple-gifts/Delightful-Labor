@@ -161,6 +161,7 @@ define('CENUM_LISTTYPE_VOLSKILLS',     'volSkills');
 define('CENUM_LISTTYPE_VOLJOBCODES',   'volShiftJobCodes');
 define('CENUM_LISTTYPE_SPONTERMCAT',   'sponTermCat');
 define('CENUM_LISTTYPE_CPREPOSTCAT',   'prePostTestCat');
+define('CENUM_LISTTYPE_USERTABLE',     'personalizedTable');
 
 //define('CENUM_LISTTYPE_TS_LOCATIONS',  'timeSheetLocations');
 

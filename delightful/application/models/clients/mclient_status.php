@@ -1,6 +1,6 @@
 <?php
 /*---------------------------------------------------------------------
- copyright (c) 2012-2015 Database Austin
+ copyright (c) 2012-2016 Database Austin
  Austin, Texas 78759
 
  author: John Zimmerman
@@ -84,12 +84,7 @@ class mclient_status extends CI_Model{
       $query = $this->db->query($sqlStr);
       $this->lNumStatCats = $numRows = $query->num_rows();
 
-//      $result = mysql_query($sqlStr);
-//      if (bSQLError('SQL error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__, $sqlStr) ) {
-//         screamForHelp('Unexpected SQL error');
-//      }else{
       $this->statCats = array();
-//         $this->lNumStatCats = $numRows = mysql_num_rows($result);
       if ($numRows==0) {
          $this->statCats[0] = new stdClass;
          $this->statCats[0]->lKeyID         =
@@ -104,8 +99,6 @@ class mclient_status extends CI_Model{
       }else {
          $idx = 0;
          foreach ($query->result() as $row){
-//         for ($idx=0; $idx<$numRows; ++$idx) {
-//            $row = mysql_fetch_array($result);
             $this->statCats[$idx] = new stdClass;
 
             $this->statCats[$idx]->lKeyID         = $row->csc_lKeyID;
@@ -135,19 +128,12 @@ class mclient_status extends CI_Model{
       $query = $this->db->query($sqlStr);
       $numRows = $query->num_rows();
 
-//      $result = mysql_query($sqlStr);
-//      if (bSQLError('SQL error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__, $sqlStr) ) {
-//         screamForHelp('Unexpected SQL error');
-//      }else{
-//         $numRows = mysql_num_rows($result);
       if ($numRows==0) {
          return(0);
       }else {
          $row = $query->row();
-//            $row = mysql_fetch_array($result);
          return((integer)$row->lNumRecs);
       }
-//      }
    }
 
    public function addNewClientStatusCat(){
@@ -163,10 +149,6 @@ class mclient_status extends CI_Model{
               csc_lOriginID = $glUserID,
               csc_dteOrigin = NOW();";
       $query = $this->db->query($sqlStr);
-//      $result = mysql_query($sqlStr);
-//      if (bSQLError('SQL error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__, $sqlStr) ) {
-//         screamForHelp('Unexpected SQL error');
-//      }
       $this->statCats[0]->lKeyID = $this->db->insert_id();
    }
 
@@ -182,10 +164,6 @@ class mclient_status extends CI_Model{
               csc_bRetired = '.($this->statCats[0]->bRetired ? '1' : '0').'
            WHERE csc_lKeyID = '.$this->statCats[0]->lKeyID.';';
       $query = $this->db->query($sqlStr);
-//      $result = mysql_query($sqlStr);
-//      if (bSQLError('SQL error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__, $sqlStr) ) {
-//         screamForHelp('Unexpected SQL error');
-//      }
    }
 
    private function sqlCommonStatCat(){
@@ -255,19 +233,12 @@ class mclient_status extends CI_Model{
       $query = $this->db->query($sqlStr);
       $numRows = $query->num_rows();
 
-//      $result = mysql_query($sqlStr);
-//      if (bSQLError('SQL error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__, $sqlStr) ) {
-//         screamForHelp('Unexpected SQL error');
-//      }else{
-//         $numRows = mysql_num_rows($result);
       if ($numRows==0) {
          return('#error#');
       }else {
-//         $row = mysql_fetch_array($result);
          $row = $query->row();
          return($row->csc_strCatName);
       }
-//      }
    }
 
    public function removeCategory($lCatID){
@@ -971,6 +942,47 @@ echo(htmlspecialchars( print_r($badStatus, true))); echo('</pre></font><br>');
       }
    }
 
+   public function lStatusCatIDViaName($strName){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $sqlStr =
+        'SELECT csc_lKeyID
+         FROM client_status_cats
+         WHERE NOT csc_bRetired
+            AND csc_strCatName='.strPrepStr($strName).';';
+      $query = $this->db->query($sqlStr);
+      $numRows = $query->num_rows();
+      if ($numRows==0){
+         return(null);
+      }else {
+         $row = $query->row();
+         return((int)$row->csc_lKeyID);
+      }
+   }
+
+   public function lStatusCatEntryIDViaName($lStatCatID, $strName){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $sqlStr =
+        'SELECT cst_lKeyID
+         FROM lists_client_status_entries
+         WHERE NOT cst_bRetired
+            AND cst_lClientStatusCatID='.$lStatCatID.'
+            AND cst_strStatus='.strPrepStr($strName).';';
+      $query = $this->db->query($sqlStr);
+      $numRows = $query->num_rows();
+      if ($numRows==0){
+         return(null);
+      }else {
+         $row = $query->row();
+         return((int)$row->cst_lKeyID);
+      }
+   }
+
+   
+   
 }
 
 ?>

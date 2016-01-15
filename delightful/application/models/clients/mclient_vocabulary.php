@@ -209,6 +209,26 @@ class mclient_vocabulary extends CI_Model{
           WHERE cr_lKeyID=$lCID;";
       $this->db->query($sqlStr);
    }
+   
+   public function lVocIDViaName($strName){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $sqlStr =
+        'SELECT cv_lKeyID
+         FROM lists_client_vocab
+         WHERE NOT cv_bRetired
+            AND cv_strVocTitle='.strPrepStr($strName).';';
+      $query = $this->db->query($sqlStr);
+      $numRows = $query->num_rows();
+      if ($numRows==0){
+         return(null);
+      }else {
+         $row = $query->row();
+         return((int)$row->cv_lKeyID);
+      }
+   }
+
 
 }
 

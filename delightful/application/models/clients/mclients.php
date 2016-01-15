@@ -1,7 +1,7 @@
 <?php
 /*---------------------------------------------------------------------
 // Delightful Labor
-// copyright (c) 2012-2015 Database Austin
+// copyright (c) 2012-2016 Database Austin
 //
 // author: John Zimmerman
 //
@@ -1156,7 +1156,24 @@ whereAmI(); die;
                          8 => array('start'=>65, 'end'=> 200, 'label'=>'Senior (65+)'));
    }
 
-
+   public function lClientLocIDViaName($strName){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $sqlStr =
+        'SELECT cl_lKeyID
+         FROM client_location
+         WHERE NOT cl_bRetired
+            AND cl_strLocation='.strPrepStr($strName).';';
+      $query = $this->db->query($sqlStr);
+      $numRows = $query->num_rows();
+      if ($numRows==0){
+         return(null);
+      }else {
+         $row = $query->row();
+         return((int)$row->cl_lKeyID);
+      }
+   }
 
 }
 

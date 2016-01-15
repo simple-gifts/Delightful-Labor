@@ -25,6 +25,17 @@
       .$clsRpt->writeCell ($strImportType)
       .$clsRpt->closeRow  ());
 
+   if ($bPTable){
+      echoT(
+          $clsRpt->openRow   ()
+         .$clsRpt->writeLabel('Table:')
+         .$clsRpt->writeCell (
+                  '['.strXlateContext($logEntry->enumAttachType, true, false).'] '.htmlspecialchars($logEntry->strUserTableName)
+                             )
+         .$clsRpt->closeRow  ());
+   }   
+      
+      
    echoT(
        $clsRpt->openRow   ()
       .$clsRpt->writeLabel('Date of Import:')

@@ -11,8 +11,8 @@ foreach ($uf as $clsUF){
    $attributes->bStartOpen   = $clsUF->enumTType == $enumOpenBlock;
    openBlock('Personalized '.$clsUF->strTTypeLabel.' Tables', '', $attributes);
    
-   echoT(strLinkAdd_UFTable($clsUF->enumTType, $strAddLabel, true, '').' '
-        .strLinkAdd_UFTable($clsUF->enumTType, $strAddLabel, false, '').'<br>');
+   echoT(strLinkAdd_UFTable($clsUF->enumTType, $strAddLabel, true,  ' id="addNewViaI_'.$clsUF->enumTType.'" ').' '
+        .strLinkAdd_UFTable($clsUF->enumTType, $strAddLabel, false, ' id="addNewViaL_'.$clsUF->enumTType.'" ').'<br>');
 
    if ($clsUF->lNumTables==0) {
          echoT(
@@ -39,6 +39,8 @@ function writeUF_TableRow(&$clsUF, &$clsUTable){
 //---------------------------------------------------------------------
    global $gbDev;
    
+   $lTableID = $clsUTable->lKeyID;
+   
    if ($gbDev){
       $strLinkDebug = '&nbsp;&nbsp;'.strLinkDebug_Fields($clsUTable->lKeyID, 'Internal field details', true);
    }else {
@@ -53,7 +55,7 @@ function writeUF_TableRow(&$clsUF, &$clsUTable){
    }else {
       $strHideStyle = 
       $strHideLabel = '';
-      $strFieldLink = strLinkView_UFFields($clsUTable->lKeyID, 'View fields', true, '').' ';
+      $strFieldLink = strLinkView_UFFields($lTableID, 'View fields', true, ' id="fieldView_'.$lTableID.'" ').' ';
    }
    
    $lTableID = $clsUTable->lKeyID;
@@ -67,25 +69,25 @@ function writeUF_TableRow(&$clsUF, &$clsUTable){
 
    echoT(
        '<tr>
-           <td class="enpRpt" style="'.$strHideStyle.'" nowrap>'
+           <td class="enpRpt" style="'.$strHideStyle.'" nowrap>'."\n"
               .str_pad($lTableID, 5, '0', STR_PAD_LEFT).'&nbsp;'
               .strLinkView_UFTable($lTableID, 'View table record', true, '').'&nbsp;&nbsp;'
               .strLinkClone_PTable($lTableID, 'Clone', true).'
            </td>
-           <td class="enpRpt" style="'.$strHideStyle.'">'
+           <td class="enpRpt" style="'.$strHideStyle.'">'."\n"
               .strLinkEdit_UFTable($lTableID, $clsUF->enumTType, 'Edit table', true, '').'
            </td>
            <td class="enpRpt" width="30%" style="'.$strHideStyle.'">
               <b>'.nl2br(htmlspecialchars($clsUTable->strUserTableName)).$strHideLabel.'</b>
            </td>
-           <td class="enpRpt" style="text-align: left; '.$strHideStyle.'" width="25%">'
+           <td class="enpRpt" style="text-align: left; '.$strHideStyle.'" width="25%">'."\n"
               .$strMLabel.'
            </td>
-           <td class="enpRpt" style="text-align: right; '.$strHideStyle.'" width="10%">'
+           <td class="enpRpt" style="text-align: right; '.$strHideStyle.'" width="10%">'."\n"
               .$strFieldLink
               .$clsUTable->lNumFields.$strLinkDebug.'
            </td>
-           <td class="enpRpt" width="40%" style="'.$strHideStyle.'">'
+           <td class="enpRpt" width="40%" style="'.$strHideStyle.'">'."\n"
               .nl2br(htmlspecialchars($clsUTable->strDescription)).'
            </td>
         </tr>');

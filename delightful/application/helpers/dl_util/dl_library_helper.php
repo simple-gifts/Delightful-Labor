@@ -366,13 +366,14 @@ function screamForHelp($strMsg, $bRecNotFound=false, $strUserErr='') {
          //------------------------------
          // mysql version
          //------------------------------
+      $CI = &get_instance();
       echoT(
          '<tr>
               <td class="errorReport" nowrap valign="top">
                  <b>mysql version:</b>
               </td>
               <td class="errorReport">'
-                 .mysql_get_server_info().'
+                 .mysqli_get_server_info($CI->db->conn_id).'
               </td>
           </tr>');
 

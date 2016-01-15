@@ -1311,7 +1311,34 @@ class mupgrade extends CI_Model{
    }
 
 
+   public function upgrade_01_013_to_01_014(){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+         // upgrade 1.014
+         // enhanced import features
+      $sqlStr =
+           "ALTER TABLE `import_log` CHANGE `il_enumImportType` `il_enumImportType`
+            ENUM('people','business','gift','sponsorPayment','personalizedTable','client')
+            NULL DEFAULT NULL;";
+      $this->db->query($sqlStr);
 
+      $sqlStr =
+        "ALTER TABLE `import_log`
+         ADD `il_lUTableID` INT NULL DEFAULT NULL
+         COMMENT 'Foreign key to uf_tables (for ptable imports only)'
+         AFTER `il_enumImportType`, ADD INDEX (`il_lUTableID`);";
+      $this->db->query($sqlStr);
+      
+         // import ID for client records
+      $sqlStr =
+         "ALTER TABLE `client_records` 
+             ADD `cr_strImportID` VARCHAR(40) NULL DEFAULT NULL AFTER `cr_lAttributedTo`;";   
+      $this->db->query($sqlStr);
+
+      $this->upgradeDBLevel('1.014', 'enhanced import features');
+      return('Upgrade from 1.013 to 1.014 successful<br>');
+   }
 
 }
 

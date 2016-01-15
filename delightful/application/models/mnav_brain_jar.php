@@ -824,14 +824,15 @@ if ($gbDev){
             <li class="dir">Import
                <ul>
                   <li>'.anchor('admin/import/'.CENUM_CONTEXT_PEOPLE,     'People Records',                'id="mb_ad_in_p"')  .'</li>
+                  <li>'.anchor('admin/import/'.CENUM_CONTEXT_CLIENT,     'Client Records',                'id="mb_ad_in_c"')  .'</li>
                   <li>'.anchor('admin/import/'.CENUM_CONTEXT_BIZ,        'Business/Organization Records', 'id="mb_ad_in_b"')  .'</li>
                   <li>'.anchor('admin/import/'.CENUM_CONTEXT_GIFT,       'Gift Records',                  'id="mb_ad_in_g"')  .'</li>
                   <li>'.anchor('admin/import/'.CENUM_CONTEXT_SPONSORPAY, 'Sponsor Payments',              'id="mb_ad_in_sp"') .'</li>
                   <li>'.anchor('admin/import/ptables',                   'Personalized Tables',           'id="mb_ad_in_pt"').'</li>
-                  <li>'.anchor('admin/import/review',                    'Review/Analyze Import File',    'id="mb_ad_in_rev"').'</li>
                   <li>'.anchor('admin/import/log',                       'Import Log',                    'id="mb_ad_in_log"').'</li>
                </ul>
             </li>';
+//                  <li>'.anchor('admin/import/review',                    'Review/Analyze Import File',    'id="mb_ad_in_rev"').'</li>
 
       $strOut .= '</ul>'."\n";
       return($strOut);

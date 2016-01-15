@@ -38,15 +38,15 @@ class uf_tables_add_edit extends CI_Controller {
                         'trim|callback_userTableVerifyRequired|callback_userTableVerifyUnique['.$enumTType.','.$lTableID.']');
 		$this->form_validation->set_rules('txtVerificationModule', 'Validation File',         'callback_verifyVerMod');
 		$this->form_validation->set_rules('txtVModEntryPoint',     'Validation Entry Point',  'callback_verifyVModEntry');
-                        
+
       $this->form_validation->set_rules('txtDescription');
       $this->form_validation->set_rules('chkMultiEntry');
       $this->form_validation->set_rules('chkReadOnly');
       $this->form_validation->set_rules('chkHide');
       $this->form_validation->set_rules('chkCollapsible');
       $this->form_validation->set_rules('chkAlertNoDataEntry');
-      $this->form_validation->set_rules('txtAlert');      
-      
+      $this->form_validation->set_rules('txtAlert');
+
 
       $displayData['bNew'] = $bNew = $lTableID<=0;
 
@@ -177,7 +177,7 @@ class uf_tables_add_edit extends CI_Controller {
          return(false);
       }
    }
-      
+
    function userTableVerifyRequired($strTableName){
       $bRetired = @$_POST['chkRetire']=='YES';
       if ($bRetired) return(true);
@@ -395,12 +395,10 @@ class uf_tables_add_edit extends CI_Controller {
          }
          if ($bNew){
             $uField->enumFieldType = $enumFieldType;
-            $this->session->set_flashdata('msg', 'New field <b>"'.htmlspecialchars($strUserFieldName).'"</b> added');
          }else {
             if (isset($_POST['rdoACO'])){
                $uField->pff_lCurrencyACO  = (integer)$_POST['rdoACO'];
             }
-            $this->session->set_flashdata('msg', 'Field <b>"'.htmlspecialchars($strUserFieldName).'"</b> updated');
          }
          switch ($enumFieldType) {
             case CS_FT_CHECKBOX:
@@ -449,6 +447,14 @@ class uf_tables_add_edit extends CI_Controller {
             default:
                screamForHelp('Invalid field type '.$lFieldType.' detected, error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__);
                break;
+         }
+            // embed the field ID in the message for Sahi testing
+         $lFieldID = $this->clsUFC->fields[0]->pff_lKeyID;
+         $strHiddenFID = '<div id="divFieldID" style="display: none;">'.$lFieldID.'</div>'."\n";
+         if ($bNew){
+            $this->session->set_flashdata('msg', 'New field <b>"'.htmlspecialchars($strUserFieldName).'"</b> added'.$strHiddenFID);
+         }else {
+            $this->session->set_flashdata('msg', 'Field <b>"'.htmlspecialchars($strUserFieldName).'"</b> updated'.$strHiddenFID);
          }
          redirect('admin/uf_fields/view/'.$lTableID);
       }

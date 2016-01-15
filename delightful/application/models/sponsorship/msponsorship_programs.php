@@ -371,7 +371,7 @@ class msponsorship_programs extends CI_Model{
       $query = $this->db->query($sqlStr);
    }
 
-   public function setClientSponProgram ($lClientID, $lSCID){
+   public function setClientSponProgram($lClientID, $lSCID){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
@@ -456,6 +456,24 @@ class msponsorship_programs extends CI_Model{
       $clsSpon->sponsorInfoGenericViaWhere($strWhere, '');
    }
 
+   public function lProgIDViaName($strName){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $sqlStr =
+        'SELECT sc_lKeyID
+         FROM lists_sponsorship_programs
+         WHERE NOT sc_bRetired
+            AND sc_strProgram='.strPrepStr($strName).';';
+      $query = $this->db->query($sqlStr);
+      $numRows = $query->num_rows();
+      if ($numRows==0){
+         return(null);
+      }else {
+         $row = $query->row();
+         return((int)$row->sc_lKeyID);
+      }
+   }
 
 
 

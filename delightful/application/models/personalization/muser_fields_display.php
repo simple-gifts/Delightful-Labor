@@ -442,6 +442,7 @@ echo(__FILE__.' '.__LINE__.'<br>'."\n"); die;
                   case CS_FT_TEXT20:
                      $strOut .= htmlspecialchars($userValue).'&nbsp;';
                      break;
+                  case CS_FT_CLIENTID :
                   case CS_FT_INTEGER :
                      $strOut .= number_format($userValue);
                      break;

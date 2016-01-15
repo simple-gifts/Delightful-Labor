@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------
 // Delightful Labor!
 //
-// copyright (c) 2010-2015 by Database Austin
+// copyright (c) 2010-2016 by Database Austin
 // Austin, Texas
 //
 // This software is provided under the GPL.
@@ -241,6 +241,34 @@ class mlist_generic extends CI_Model{
       }
    }
 
+   public function loadListUTable($lFieldID, $bIncludeRetired, $bOrderViaSortIDX){
+   //-----------------------------------------------------------------
+   // load the personalized list associated with personalized ddl 
+   // and mddl fields
+   //-----------------------------------------------------------------
+      $this->listItems = array();
+      $sqlStr =
+        "SELECT ufddl_lKeyID AS lListKeyID, ufddl_strDDLEntry AS strListItem
+         FROM uf_ddl
+         WHERE `ufddl_lFieldID`=$lFieldID "
+            .($bIncludeRetired ? '' : ' AND NOT ufddl_bRetired ').'
+         ORDER BY '.($bOrderViaSortIDX ? ' ufddl_lSortIDX ' : ' ufddl_strDDLEntry ' ).', ufddl_lKeyID;';
+
+      $query = $this->db->query($sqlStr);
+      $this->lNumInList = $numRows = $query->num_rows();
+      if ($numRows==0) {
+      }else {
+         $idx = 0;
+         foreach ($query->result() as $row) {
+            $this->listItems[$idx] = new stdClass;
+            $this->listItems[$idx]->lKeyID      = $row->lListKeyID;
+            $this->listItems[$idx]->strListItem = $row->strListItem;
+
+            ++$idx;
+         }
+      }
+   }
+
    public function strRetrieveListItem($lListID){
    //-----------------------------------------------------------------
    //
@@ -282,7 +310,6 @@ class mlist_generic extends CI_Model{
       }
    }
    
-
    public function lInsertNewListItem($strItem){
    //-----------------------------------------------------------------
    //

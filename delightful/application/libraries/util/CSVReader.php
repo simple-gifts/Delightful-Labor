@@ -49,11 +49,11 @@ class CSVReader {
      * @param    boolean
      * @return    array
      */
-     
+
    function bTestDupHeaderCols($pFilepath, &$lNumDups, &$dups){
    //---------------------------------------------------------------------
    // jpz test for duplicate non-blank, case insensitive header columns
-   //---------------------------------------------------------------------   
+   //---------------------------------------------------------------------
       $lNumDups = 0;
       $dups = array();
       $headerCnt = array();
@@ -77,15 +77,16 @@ class CSVReader {
          }
       }
       fclose($file);
-      return($lNumDups > 0);      
-   }   
-     
+      return($lNumDups > 0);
+   }
+
             // jpz - added $bForceFNLower
     function parse_file($p_Filepath, $p_NamedFields = true, $bForceFNLower = false, $bTrimFN = true) {
-
         $content = false;
         $file = fopen($p_Filepath, 'r');
+             
         if($p_NamedFields) {
+
             $this->fields = fgetcsv($file, $this->max_row_size, $this->separator, $this->enclosure);
             if ($bTrimFN){
                if ($this->fields!==false){
@@ -97,6 +98,7 @@ class CSVReader {
                }
             }
         }
+
         while( ($row = fgetcsv($file, $this->max_row_size, $this->separator, $this->enclosure)) !== false ) {
                   // jpz - CSVReader originally only tested first cell; if empty, the
                   //       code assumed the entire row was empty
@@ -118,7 +120,7 @@ class CSVReader {
                     $items = array();
                     // I prefer to fill the array with values of defined fields
                     foreach( $this->fields as $id => $field ) {
-                    
+
                         if ($bForceFNLower) $field = strtolower($field);
                         if( isset($row[$id]) ) {
                             $items[$field] = $row[$id];

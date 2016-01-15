@@ -200,6 +200,13 @@ class muser_fields_create extends muser_fields{
                  WHERE NOT vol_bRetired;";
             break;
 
+         case CENUM_CONTEXT_USER:
+            $sqlStr =
+                "INSERT INTO $strTableName ($strForeignKeyField)
+                 SELECT us_lKeyID FROM admin_users
+                 WHERE 1;";
+            break;
+            
          default:
             screamForHelp($this->enumTType.': Invalid personalized table type, error on line '.__LINE__.', file '.__FILE__.', function '.__FUNCTION__);
             break;

@@ -16,6 +16,7 @@ class client_dir extends CI_Controller {
       $this->clientDirectory($lLocationID, null,
                  $showInactive, $strLookupLetter, $lStartRec, $lRecsPerPage);
    }
+
    function sProg($lSponProgID, $showInactive='N', $strLookupLetter='A', $lStartRec=0, $lRecsPerPage=50){
    //------------------------------------------------------------------------------
    //  by location
@@ -36,7 +37,7 @@ class client_dir extends CI_Controller {
       }
       $clsLocation->cl_lKeyID = $lLocationID;
       $clsLocation->loadLocationRec($lLocationID);
-      
+
       $displayData = array();
       $displayData['js'] = '';
       $displayData['ddlLocations'] = $clsLocation->strDDLAllLocations($lLocationID);
@@ -148,7 +149,7 @@ class client_dir extends CI_Controller {
          //------------------------------------------------
       if ($bViaSponProg){
          $this->clsSponProg->loadSponProgsGeneric(false);
-         
+
          $displayData['lNumSponProg'] = $lNumSponProg = $this->clsSponProg->lNumSponPrograms;
          if ($lSponProgID <= 0){
             $lSponProgID = $this->clsSponProg->sponProgs[0]->lKeyID;
@@ -189,15 +190,15 @@ class client_dir extends CI_Controller {
       $strLabelToggle = ($bIncludeInactive ? 'Hide' : 'Show').' inactive clients';
       if ($bViaLocation){
          $displayData['strLinkBase']  = $strLinkBase = 'clients/client_dir/view/'.$lLocationID.'/'.($bIncludeInactive ? 'Y' : 'N').'/';
-         $displayData['strToggleLink'] = 
+         $displayData['strToggleLink'] =
                 anchor('clients/client_dir/view/'.$lLocationID.'/'.($bIncludeInactive ? 'N' : 'Y').'/'.$strLinkEnd, $strLabelToggle);
       }elseif ($bViaSponProg) {
          $displayData['strLinkBase']  = $strLinkBase = 'clients/client_dir/sProg/'.$lSponProgID.'/'.($bIncludeInactive ? 'Y' : 'N').'/';
-         $displayData['strToggleLink'] = 
+         $displayData['strToggleLink'] =
                 anchor('clients/client_dir/sProg/'.$lSponProgID.'/'.($bIncludeInactive ? 'N' : 'Y').'/'.$strLinkEnd, $strLabelToggle);
       }else {
          $displayData['strLinkBase']  = $strLinkBase = 'clients/client_dir/name/'.($bIncludeInactive ? 'Y' : 'N').'/';
-         $displayData['strToggleLink'] = 
+         $displayData['strToggleLink'] =
                 anchor('clients/client_dir/name/'.($bIncludeInactive ? 'N' : 'Y').'/'.$strLinkEnd, $strLabelToggle);
       }
       $displayData['strDirTitle']  = strDisplayDirectory(

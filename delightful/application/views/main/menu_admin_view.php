@@ -64,6 +64,7 @@
 
          <ul style="margin-top: 4pt;">
             <li>'.anchor('admin/import/'.CENUM_CONTEXT_PEOPLE,     'People Records'               ).'</li>
+            <li>'.anchor('admin/import/'.CENUM_CONTEXT_CLIENT,     'Client Records'               ).'</li>
             <li>'.anchor('admin/import/'.CENUM_CONTEXT_BIZ,        'Business/Organization Records').'</li>
             <li>'.anchor('admin/import/'.CENUM_CONTEXT_GIFT,       'Gift Records'                 ).'</li>
             <li>'.anchor('admin/import/'.CENUM_CONTEXT_SPONSORPAY, 'Sponsor Payments'             ).'</li>

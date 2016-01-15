@@ -473,7 +473,7 @@ class msponsor_charge_pay extends CI_Model{
                     <td class="enpRpt" style="text-align: right;">'
                        .number_format($clsBal->curPaymentTot, 2).'
                     </td>
-                    <td class="enpRpt" style="text-align: right;">'
+                    <td class="enpRpt" style="text-align: right;" id="sponBalDue">'
                        .number_format($curBalance, 2).'
                     </td>
                  </tr>';

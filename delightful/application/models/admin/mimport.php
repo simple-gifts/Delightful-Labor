@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------
 // Delightful Labor!
 //
-// copyright (c) 2012-2015 by Database Austin
+// copyright (c) 2012-2016 by Database Austin
 // Austin, Texas
 //
 // This software is provided under the GPL.
@@ -48,12 +48,13 @@ Sample usage:
 //-----------------------------------------------------------------------
 class mimport extends CI_Model{
    public $importFields, $lNumFields, $enumContext, $headerFields,
-          $strErrMsg, $bError, $enumGenders, $aco,
+          $strErrMsg, $bError, $enumGenders, $enumYesNo, $aco,
           $lImportLogID,
           $forceSet, $lErrCnt, $lMaxErrCnt,
           $strImportTable,
           $lNumLogEntries, $logEntries, $lNumImportDetails, $importDetails,
-          $lNumFIDs, $foreignIDs;
+          $lNumFIDs, $foreignIDs,
+          $clients, $cstatus, $cvoc, $csponprog;
 
 
    public function __construct() {
@@ -62,6 +63,7 @@ class mimport extends CI_Model{
    //-----------------------------------------------------------------------
 		parent::__construct();
       $this->enumGenders  = array('male', 'female', 'unknown');
+      $this->enumYesNo    = array('yes', 'no');
       $this->aco = null; $this->genericList = array();
       $this->lNumImportDetails = $this->lNumLogEntries = 0;
       $this->importDetails     = $this->logEntries     = null;
@@ -82,6 +84,12 @@ class mimport extends CI_Model{
 
       $this->lErrCnt    = 0;
       $this->lMaxErrCnt = 20;
+      $this->clients   = new mclients;
+      if ($enumContext==CENUM_CONTEXT_CLIENT){
+         $this->cstatus   = new mclient_status;
+         $this->cvoc      = new mclient_vocabulary;
+         $this->csponprog = new msponsorship_programs;
+      }
    }
 
    public function initACOTable(&$clsACO){
@@ -95,13 +103,17 @@ class mimport extends CI_Model{
       }
    }
 
-   public function initGenericListTable($genListIDX, $enumListType, &$clsList){
+   public function initGenericListTable($genListIDX, $enumListType, &$clsList, $lFieldID=null){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
       $this->genericList[$genListIDX] = array();
-      $clsList->initializeListManager('generic', $enumListType);
-      $clsList->loadList();
+      if ($enumListType == CENUM_LISTTYPE_USERTABLE){
+         $clsList->loadListUTable($lFieldID, false, false);
+      }else {
+         $clsList->initializeListManager('generic', $enumListType);
+         $clsList->loadList();
+      }
       if ($clsList->lNumInList > 0){
          foreach ($clsList->listItems as $listEntry){
             $this->genericList[$genListIDX][$listEntry->lKeyID] = strtolower($listEntry->strListItem);
@@ -109,9 +121,9 @@ class mimport extends CI_Model{
       }
    }
 
-   public function addImportField($strFieldName,    $enumType,  $lMaxLen,
-                                  $varDefaultValue, $bRequired, $strDBFN,
-                                  $lGenListIDX=null){
+   public function addImportField($strFieldName,     $enumType,  $lMaxLen,
+                                  $varDefaultValue,  $bRequired, $strDBFN,
+                                  $lGenListIDX=null, $lFieldID=-1){
    /*
     * supported types:
     *    'integer'
@@ -128,6 +140,7 @@ class mimport extends CI_Model{
    */
       $this->importFields[$this->lNumFields] = new stdClass;
       $field = &$this->importFields[$this->lNumFields];
+      $field->lFieldID      = $lFieldID;
       $field->fieldName     = strtolower($strFieldName);
       $field->userFieldName = $strFieldName;
       $field->type          = $enumType;
@@ -147,6 +160,7 @@ class mimport extends CI_Model{
       ++$this->lNumFields;
    }
 
+
    public function setHeaderFields($csvFields){
    //---------------------------------------------------------------------
    //
@@ -157,6 +171,7 @@ class mimport extends CI_Model{
 
       foreach ($this->importFields as $field){
          $strFN = $field->fieldName;
+
          $lColIDX = array_search($strFN, $this->headerFields);
          if ($lColIDX===false){
             if ($field->required){
@@ -171,12 +186,13 @@ class mimport extends CI_Model{
       }
    }
 
-   public function verifyCSV(&$userCSV){
+   public function verifyCSV(&$userCSV, $enumAttachType){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
       $idx = 2;
       foreach($userCSV as $rec){
+         $this->lClientStatCatID = -1;
          $this->bAcct   = $this->bCamp   = false;
          $this->strAcct = $this->strCamp = '';
          foreach ($this->importFields as $field){
@@ -184,7 +200,12 @@ class mimport extends CI_Model{
                $varUserValue = $rec[$field->fieldName];
                $this->verifyViaDataType($idx,               $varUserValue,         $field->type,
                                         $field->required,   $field->userFieldName, $field->maxLen,
-                                        $field->genListIDX, $field->DBFieldName);
+                                        $field->genListIDX, $field->DBFieldName,   $enumAttachType);
+//                  // special case - client initial status, based on the status category
+//               if ($enumAttachType==CENUM_CONTEXT_CLIENT && $field->DBFieldName==cr_lStatusCatID){
+//                  $this->lClientStatCatID = (int)$varUserValue;
+//               }
+
                if ($this->lErrCnt >= $this->lMaxErrCnt) return;
             }
          }
@@ -243,8 +264,8 @@ class mimport extends CI_Model{
    }
 
    function verifyViaDataType($lLineNum,    $varUserValue, $enumType,
-                                      $bRequired,   $strUserFN,    $lMaxLen,
-                                      $lGenListIDX, $strDBFN){
+                              $bRequired,   $strUserFN,    $lMaxLen,
+                              $lGenListIDX, $strDBFN,      $enumAttachType){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
@@ -258,6 +279,20 @@ class mimport extends CI_Model{
                if (strlen($strVal) > $lMaxLen){
                   $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN)
                                      .'" exceeds the maximum length of '.$lMaxLen.' characters (record '.$lLineNum.')<br>');
+                  $this->bError    = true;
+                  ++$this->lErrCnt;
+                  if ($this->lErrCnt >= $this->lMaxErrCnt) return;
+               }
+            }
+            break;
+
+         case 'YesNo':
+            $strVal = strtolower(trim($varUserValue.''));
+            if ($this->bRequiredErr($bRequired, $strVal, $strUserFN, $lLineNum)) return;
+            if ($strVal != ''){
+               if (!in_array($strVal, $this->enumYesNo)){
+                  $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                                    .htmlspecialchars($strVal).'</b> is not a valid yes/no entry (record '.$lLineNum.')<br>');
                   $this->bError    = true;
                   ++$this->lErrCnt;
                   if ($this->lErrCnt >= $this->lMaxErrCnt) return;
@@ -305,6 +340,24 @@ class mimport extends CI_Model{
                   $this->bError    = true;
                   ++$this->lErrCnt;
                   if ($this->lErrCnt >= $this->lMaxErrCnt) return;
+               }
+            }
+            break;
+
+         case 'mgenList':
+            $strList = explode("\n", $varUserValue);
+            foreach ($strList as $strVal){
+               $strVal = strtolower(trim($strVal.''));
+               if ($this->bRequiredErr($bRequired, $strVal, $strUserFN, $lLineNum)) return;
+               if ($strVal != ''){
+                  $lGenListID = array_search($strVal, $this->genericList[$lGenListIDX]);
+                  if ($lGenListID === false){
+                     $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                                .htmlspecialchars($strVal).'</b> is not a valid list entry (record '.$lLineNum.')<br>');
+                     $this->bError    = true;
+                     ++$this->lErrCnt;
+                     if ($this->lErrCnt >= $this->lMaxErrCnt) return;
+                  }
                }
             }
             break;
@@ -357,6 +410,30 @@ class mimport extends CI_Model{
             }
             break;
 
+         case 'clientID':
+            $strVal = trim($varUserValue.'');
+            if ($this->bRequiredErr($bRequired, $strVal, $strUserFN, $lLineNum)) return;
+            if ($strVal != ''){
+               if (!is_numeric($strVal)){
+                  $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                             .htmlspecialchars($strVal).'</b> is not a valid clientID entry. '
+                             .' (record '.$lLineNum.')<br>');
+                  $this->bError = true;
+                  ++$this->lErrCnt;
+                  if ($this->lErrCnt >= $this->lMaxErrCnt) return;
+               }else {
+                  if (!$this->clients->bValidClientID((int)$strVal)){
+                     $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                                .htmlspecialchars($strVal).'</b> clientID not found. '
+                                .' (record '.$lLineNum.')<br>');
+                     $this->bError = true;
+                     ++$this->lErrCnt;
+                     if ($this->lErrCnt >= $this->lMaxErrCnt) return;
+                  }
+               }
+            }
+            break;
+
          case 'Account':
             $strVal = trim($varUserValue.'');
             if ($this->bRequiredErr($bRequired, $strVal, $strUserFN, $lLineNum)) return;
@@ -371,6 +448,12 @@ class mimport extends CI_Model{
             $this->strCamp = $strVal;
             break;
 
+         case 'clientSpecial':
+            $strVal = trim($varUserValue.'');
+            if ($this->bRequiredErr($bRequired, $strVal, $strUserFN, $lLineNum)) return;
+            $this->bVerifyClientSpecialField($strVal, $strDBFN, $strUserFN, $lLineNum);
+            break;
+
          case 'email':
             $strVal = trim($varUserValue.'');
             if ($this->bRequiredErr($bRequired, $strVal, $strUserFN, $lLineNum)) return;
@@ -382,8 +465,18 @@ class mimport extends CI_Model{
                   $this->bError = true;
                   ++$this->lErrCnt;
                   if ($this->lErrCnt >= $this->lMaxErrCnt) return;
-
                }
+            }
+            break;
+
+            // ID type used in personalized tables - the foreign Key
+         case 'ID':
+            $strVal = trim($varUserValue.'');
+            if (!$this->bVerifyPTableKey((integer)$strVal, $enumAttachType)){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($strVal).'</b> is not a valid ID. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
             }
             break;
 
@@ -410,12 +503,142 @@ class mimport extends CI_Model{
       }
    }
 
-
-   public function lInsertImport(&$userCSV, $lGroupIDs){
+   function getClientSpecialField($varUserValue, &$field){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
-      global $glUserID;
+      switch ($field->DBFieldName){
+         case 'cr_lLocationID':
+            return($this->clients->lClientLocIDViaName($varUserValue));
+            break;
+         case 'cr_lStatusCatID':
+            return($this->lClientStatCatID = $this->cstatus->lStatusCatIDViaName($varUserValue));
+            break;
+         case 'cr_lVocID':
+            return($this->cvoc->lVocIDViaName($varUserValue));
+            break;
+         case 'sponProg':
+            $field->mListIDs = array();
+
+            $strList = explode("\n", $varUserValue);
+            foreach ($strList as $strVal){
+               $strVal = strtolower(trim($strVal.''));
+               if ($strVal != ''){
+                  $field->mListIDs[] = $this->csponprog->lProgIDViaName($strVal);
+               }
+            }
+//
+//            if ($strVal=='') return;
+//            $progs = explode("\n", $strVal);
+//            foreach ($progs as $prog){
+//               $prog = trim($prog);
+//               if (is_null($this->csponprog->lProgIDViaName($prog))){
+//                  $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+//                             .htmlspecialchars($prog).'</b> is not a valid sponsorship program. '
+//                             .' (record '.$lLineNum.')<br>');
+//                  $this->bError = true;
+//               }
+//            }
+            break;
+         case 'initialStatus':
+            return($this->cstatus->lStatusCatEntryIDViaName($this->lClientStatCatID, $varUserValue));
+            break;
+
+         default:
+            screamForHelp($field->DBFieldName.': invalid client data type<br>error on line <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+
+   }
+
+   private function bVerifyClientSpecialField($strVal, $strDBFN, $strUserFN, $lLineNum){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      if ($strVal=='') return;
+      switch ($strDBFN){
+         case 'cr_lLocationID':
+            if (is_null($this->clients->lClientLocIDViaName($strVal))){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($strVal).'</b> is not a valid client location. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
+            }
+            break;
+         case 'cr_lStatusCatID':
+            if (is_null($this->lClientStatCatID = $this->cstatus->lStatusCatIDViaName($strVal))){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($strVal).'</b> is not a valid client status category. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
+            }
+            break;
+         case 'cr_lVocID':
+            if (is_null($this->cvoc->lVocIDViaName($strVal))){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($strVal).'</b> is not a valid client vocabulary. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
+            }
+            break;
+         case 'sponProg':
+            if ($strVal=='') return;
+            $progs = explode("\n", $strVal);
+            foreach ($progs as $prog){
+               $prog = trim($prog);
+               if (is_null($this->csponprog->lProgIDViaName($prog))){
+                  $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                             .htmlspecialchars($prog).'</b> is not a valid sponsorship program. '
+                             .' (record '.$lLineNum.')<br>');
+                  $this->bError = true;
+               }
+            }
+            break;
+         case 'initialStatus':
+            if ($this->lClientStatCatID==-1){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($prog).'</b> column must appear after column <b>Status Category</b>. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
+               return;
+            }elseif (is_null($this->lClientStatCatID)){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($prog).'</b> not valid if <b>Status Category</b> is not set. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
+               return;
+            }
+            if (is_null($this->cstatus->lStatusCatEntryIDViaName($this->lClientStatCatID, $strVal))){
+               $this->strErrMsg .= strQuoteFix('Field "'.htmlspecialchars($strUserFN).'": <b>'
+                          .htmlspecialchars($strVal).'</b> is not a valid client status. '
+                          .' (record '.$lLineNum.')<br>');
+               $this->bError = true;
+            }
+            break;
+
+         default:
+            screamForHelp($strDBFN.': invalid client data type<br>error on line <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+   }
+
+
+
+
+   public function lInsertImport(&$userCSV, $lGroupIDs, $utable){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $glUserID, $gdteNow;
+
+      $bClientImport = $this->strImportTable == 'client_records';
+
+      if (is_null($utable)){
+         $bMultiTable = true;
+      }else {
+         $bMultiTable = $utable->bMultiEntry;
+         $lUTableID = $utable->lTableID;
+      }
 
       $bAddToGroup = count($lGroupIDs) > 0;
       if ($bAddToGroup){
@@ -423,31 +646,60 @@ class mimport extends CI_Model{
          $cgroup->enumSubGroup = null;
       }
 
-      $this->lImportLogID = $lLogID = $this->lAddImportLogEntry($this->enumContext);
+      $this->lImportLogID = $lLogID = $this->lAddImportLogEntry($this->enumContext, $utable);
+
       $sqlBase = "INSERT INTO $this->strImportTable
                   SET
                   ";
 
+         // perpare for potential volunteer import
+      if ($this->enumContext==CENUM_CONTEXT_PEOPLE){
+         $cvol = new mvol;
+         $cvol->volRecs = array();
+         $cvol->volRecs[0] = new stdClass;
+         $cvol->volRecs[0]->Notes = 'Included in people import / logID: '.$lLogID;
+      }
+
       $this->bGIK = false;
       foreach($userCSV as $rec){
-         $sqlStr     = $sqlBase;
-         $this->bGIK = false;
+         $sqlStr         = '';
+         $this->bGIK     = false;
+         $bAddVolRec     = false;
+         $bAnyMultiLists = false;
+         $lForeignID     = null;
+
+         $this->lClientStatCatID = -1;
+         $lInitialClientStatusID = -1;
+
          foreach ($this->importFields as $field){
+            $bMultiListClientSP = ($field->type=='clientSpecial') && ($field->DBFieldName == 'sponProg');
+            $bClientInitStatus  = ($field->type=='clientSpecial') && ($field->DBFieldName == 'initialStatus');
+            $bMultiList = $field->type=='mgenList';
+            $bAnyMultiLists = $bAnyMultiLists || $bMultiList;
             $strDBField = $field->DBFieldName;
+
             if (is_null($field->colIDX)){
                $varUserValue = null;
             }else {
                $varUserValue = $rec[$field->fieldName];
             }
-               // a null field name means that this field is not to be inserted
-            if (!is_null($strDBField)){
-               $sqlStr .= $strDBField.' = '.$this->strPrepInputVar(
-                                                           $field->type,
-                                                           $field->defaultValue,
-                                                           $field->genListIDX,
-                                                           $varUserValue,
-                                                           $strDBField,
-                                                           $rec).", \n";
+
+            $bPeopleVolField = $strDBField == 'isVolunteer';
+            if ($bPeopleVolField){
+               $bAddVolRec = strtolower($varUserValue.'')=='yes';
+            }else {
+                  // a null field name means that this field is not to be inserted
+               if (!(is_null($strDBField) || $bClientInitStatus)){
+                  $strFieldValue = $this->strPrepInputVar(
+                                         $field, $varUserValue, $strDBField, $rec, $lForeignID).", \n";
+                  if ($field->type == 'ID') $lFKeyID = (int)$varUserValue;
+                  if (!($bMultiList || $bMultiListClientSP)) $sqlStr .= $strDBField.' = '.$strFieldValue;
+               }else {
+                  if ($bClientInitStatus){
+                     $lInitialClientStatusID =
+                            $this->strPrepInputVar($field, $varUserValue, $strDBField, $rec, $lForeignID);
+                  }
+               }
             }
          }
 
@@ -462,9 +714,48 @@ class mimport extends CI_Model{
                $sqlStr .= $setF['fn'].' = '.$setF['value'].", \n";
             }
          }
-         $sqlStr = substr($sqlStr, 0, -3).';';  // remove trailing comma
-         $this->db->query($sqlStr);
-         $lKeyID = $this->db->insert_id();
+         $sqlStr = substr($sqlStr, 0, -3).' ';  // remove trailing comma
+
+         if ($bMultiTable){
+            $this->db->query($sqlBase.$sqlStr.';');
+            $lKeyID = $this->db->insert_id();
+         }else {
+            $lKeyID = $this->insertUpdateUTable($utable, $sqlStr, $lFKeyID);
+         }
+
+         if ($bClientImport){
+               // client import - sponsorship programs for client
+            foreach ($this->importFields as $field){
+               if ($field->DBFieldName=='sponProg'){
+                  if (count($field->mListIDs) > 0){
+                     foreach($field->mListIDs as $lSCID){
+                        $this->csponprog->setClientSponProgram($lKeyID, $lSCID);
+                     }
+                  }
+               }
+
+               if ($field->DBFieldName=='initialStatus'){
+                  $this->cstatus->clientStatus = array();
+                  $this->cstatus->clientStatus[0] = new stdClass;;
+                  $this->cstatus->clientStatus[0]->lClientID = $lKeyID;
+                  $this->cstatus->clientStatus[0]->lStatusID = $lInitialClientStatusID;
+                  $this->cstatus->clientStatus[0]->bIncludeNotesInPacket = false;
+                  $this->cstatus->clientStatus[0]->dteStatus = $gdteNow;
+                  $this->cstatus->clientStatus[0]->strStatusTxt = 'Initial Status (via import)';
+                  $this->cstatus->lInsertClientStatus();
+               }
+            }
+         }
+
+            // any multi-select lists?
+         if ($bAnyMultiLists){
+               // personalized table multi-select DDL
+            foreach ($this->importFields as $field){
+               if ($field->type=='mgenList'){
+                  $this->updateMultiList($lUTableID, $field->mListIDs, $lKeyID, $field->lFieldID, $lForeignID);
+               }
+            }
+         }
 
             // add record to groups?
          if ($bAddToGroup){
@@ -473,6 +764,12 @@ class mimport extends CI_Model{
                $cgroup->lGroupID = $lGroupID;
                $cgroup->addGroupMembership();
             }
+         }
+
+            // people record / add as volunteer?
+         if ($bAddVolRec){
+            $cvol->volRecs[0]->lPeopleID = $lKeyID;
+            $cvol->lAddNewVolunteer();
          }
 
          $this->logImportRec($lLogID, $lKeyID);
@@ -484,12 +781,46 @@ class mimport extends CI_Model{
       }
    }
 
-   private function strPrepInputVar($enumType,     $varDefaultValue, $lGenListIDX,
-                                    $varUserValue, $strDBField,      &$userRec){
+   private function updateMultiList($lUTableID, $mListIDs, $lKeyID, $lFieldID, $lForeignID){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+         // out with the old
+      $sqlStr =
+        "DELETE FROM uf_ddl_multi
+         WHERE
+                pdm_lUTableID    = $lUTableID
+            AND pdm_lFieldID     = $lFieldID
+            AND pdm_lUTableRecID = $lKeyID;";
+      $this->db->query($sqlStr);
+
+         // in with the new
+      if (count($mListIDs) > 0){
+         $sqlValues = '';
+         foreach ($mListIDs as $lDDLID){
+            $sqlValues .= ', '."\n".'('.$lFieldID.', '.$lUTableID.', '.$lKeyID.', '.$lDDLID.')';
+         }
+         $sqlStr =
+           'INSERT INTO `uf_ddl_multi` (`pdm_lFieldID`, `pdm_lUTableID`, `pdm_lUTableRecID`, `pdm_lDDLID`)
+            VALUES '.substr($sqlValues, 1).';';
+         $this->db->query($sqlStr);
+      }
+   }
+
+   private function strPrepInputVar(&$field,
+                                    $varUserValue, $strDBField,      &$userRec,
+                                    &$lForeignID){
    //---------------------------------------------------------------------
    // a default value that begins with '#' means use the value for
    // the field following the '#'
    //---------------------------------------------------------------------
+
+      $enumType        = $field->type;
+      $varDefaultValue = $field->defaultValue;
+      $lGenListIDX     = $field->genListIDX;
+
+      $field->mListIDs   = null;  // list of list IDs for multi-drop downs
+
       $varUserValue = trim($varUserValue);
       if ($varUserValue.'' == ''){
          if (is_null($varDefaultValue)){
@@ -507,11 +838,14 @@ class mimport extends CI_Model{
       switch ($enumType){
          case 'text':
          case 'email':
-            return(strPrepStr($varUserValue));
+            return(strPrepStr($varUserValue.''));
             break;
 
+         case 'ID':
+            $lForeignID = (int)$varUserValue;
          case 'int':
-            return((integer)$varUserValue);
+         case 'clientID':
+            return((int)$varUserValue);
             break;
 
          case 'currency':
@@ -528,19 +862,43 @@ class mimport extends CI_Model{
 
          case 'genList':
             $lIdx = array_search(strtolower($varUserValue), $this->genericList[$lGenListIDX]);
-            if ($lIdx===false) $lIdx = $varDefaultValue;
+            if ($lIdx===false){
+               $lIdx = $varDefaultValue;
+               if ($lIdx.'' == '') $lIdx = 'null';
+            }
             if ($strDBField=='gi_lGIK_ID' && $varUserValue!='null'){
                $this->bGIK = true;
             }
             return($lIdx);
             break;
 
+         case 'mgenList':
+            $field->mListIDs = array();
+
+            $strList = explode("\n", $varUserValue);
+            foreach ($strList as $strVal){
+               $strVal = strtolower(trim($strVal.''));
+               if ($strVal != ''){
+                  $field->mListIDs[] = array_search($strVal, $this->genericList[$lGenListIDX]);
+               }
+            }
+            break;
+
          case 'mysqlDate':
             return(strPrepStr($varUserValue));
             break;
 
+         case 'YesNo':
+            return((strtolower($varUserValue.'')=='yes') ? '1' : '0');
+            break;
+
          case 'enumGender':
             return(strPrepStr($varUserValue));
+            break;
+
+         case 'clientSpecial':
+            $clientValue = $this->getClientSpecialField($varUserValue, $field);
+            if (!is_null($clientValue)) return($clientValue);
             break;
 
          default:
@@ -549,18 +907,30 @@ class mimport extends CI_Model{
       }
    }
 
-   private function lAddImportLogEntry($enumType){
+   private function lAddImportLogEntry($enumType, $utable){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
       global $glUserID;
-      $sqlStr =
-         'INSERT INTO import_log
-          SET
-             il_enumImportType='.strPrepStr($enumType).",
-             il_bRetired=0,
-             il_lOriginID=$glUserID,
-             il_dteOrigin=NOW();";
+      if (is_null($utable)){
+         $sqlStr =
+            'INSERT INTO import_log
+             SET
+                il_enumImportType='.strPrepStr($enumType).",
+                il_bRetired  = 0,
+                il_lOriginID = $glUserID,
+                il_dteOrigin = NOW();";
+      }else {
+         $sqlStr =
+            'INSERT INTO import_log
+             SET
+                il_enumImportType='.strPrepStr(CENUM_CONTEXT_PTABLE).",
+                il_lUTableID = $utable->lTableID,
+                il_bRetired  = 0,
+                il_lOriginID = $glUserID,
+                il_dteOrigin = NOW();";
+
+      }
       $this->db->query($sqlStr);
       return($this->db->insert_id());
    }
@@ -584,11 +954,14 @@ class mimport extends CI_Model{
       }
       $this->logEntries = array();
       $sqlStr =
-           "SELECT il_lKeyID, il_enumImportType, il_lOriginID,
+           "SELECT il_lKeyID, il_enumImportType, il_lUTableID, il_lOriginID,
                UNIX_TIMESTAMP(il_dteOrigin) AS dteOrigin,
-               usersC.us_strFirstName AS strCFName, usersC.us_strLastName AS strCLName
+               usersC.us_strFirstName AS strCFName, usersC.us_strLastName AS strCLName,
+
+               pft_strUserTableName, pft_strDataTableName, pft_enumAttachType, pft_bMultiEntry
             FROM import_log
                INNER JOIN admin_users AS usersC ON il_lOriginID = usersC.us_lKeyID
+               LEFT  JOIN uf_tables             ON pft_lKeyID   = il_lUTableID
             WHERE NOT il_bRetired $strWhere
             ORDER BY  il_lKeyID DESC;";
       $query = $this->db->query($sqlStr);
@@ -601,17 +974,52 @@ class mimport extends CI_Model{
          foreach ($query->result() as $row){
             $this->logEntries[$idx] = new stdClass;
             $entry = &$this->logEntries[$idx];
-            $entry->lKeyID           = $lLogID = $row->il_lKeyID;
-            $entry->enumImportType   = $row->il_enumImportType;
-            $entry->lOriginID        = $row->il_lOriginID;
-            $entry->dteOrigin        = $row->dteOrigin;
-            $entry->strUserCFName    = $row->strCFName;
-            $entry->strUserCLName    = $row->strCLName;
-            $entry->strUserCSafeName = htmlspecialchars($row->strCFName.' '.$row->strCLName);
-            $entry->lNumRecs         = $this->lNumRecsViaImportID($lLogID);
+            $entry->lKeyID            = $lLogID = $row->il_lKeyID;
+            $entry->enumImportType    = $row->il_enumImportType;
+            $entry->lUTableID         = $row->il_lUTableID;
+
+            $entry->strUserTableName  = $row->pft_strUserTableName;
+            $entry->strDataTableName  = $row->pft_strDataTableName;
+            $entry->enumAttachType    = $row->pft_enumAttachType;
+            $entry->bMultiEntry       = $row->pft_bMultiEntry;
+
+            $entry->lOriginID         = $row->il_lOriginID;
+            $entry->dteOrigin         = $row->dteOrigin;
+            $entry->strUserCFName     = $row->strCFName;
+            $entry->strUserCLName     = $row->strCLName;
+            $entry->strUserCSafeName  = htmlspecialchars($row->strCFName.' '.$row->strCLName);
+            $entry->lNumRecs          = $this->lNumRecsViaImportID($lLogID);
             ++$idx;
          }
       }
+   }
+
+   function pTableForeignIDsViaImportID($lImportID, $lUTableID, &$lNumFIDs){
+   //---------------------------------------------------------------------
+   // return an array of foreign IDs for the pTable records that
+   // were included in a given import
+   //---------------------------------------------------------------------
+      $FIDs = array();
+      $cUF = new muser_fields;
+      $strUTable  = $cUF->strGenUF_TableName($lUTableID);
+      $strKeyIDFN = $cUF->strGenUF_KeyIDFN($lUTableID);
+      $strFID_FN  = $cUF->strGenUF_ForeignIDFN($lUTableID);
+
+      $sqlStr =
+         "SELECT DISTINCT $strFID_FN AS lKeyID
+          FROM import_ids
+             INNER JOIN $strUTable ON $strKeyIDFN=iid_lForeignID
+          WHERE iid_lImportID=$lImportID
+          ORDER BY $strFID_FN;";
+
+      $query = $this->db->query($sqlStr);
+      $lNumFIDs = $query->num_rows();
+      if ($this->lNumFIDs > 0){
+         foreach ($query->result() as $row)   {
+            $FIDs[] = (int)$row->lKeyID;
+         }
+      }
+      return($FIDs);
    }
 
    function lNumRecsViaImportID($lLogID){
@@ -631,23 +1039,53 @@ class mimport extends CI_Model{
       $this->lNumFIDs = $query->num_rows();
       if ($this->lNumFIDs > 0){
          foreach ($query->result() as $row)   {
-            $this->foreignIDs[] = $row->iid_lForeignID;
+            $this->foreignIDs[] = (int)$row->iid_lForeignID;
          }
       }
    }
 
-   public function bVerifyForeignKey($lID, $strTable, $strKeyFN, $strRetiredFN){
+   public function bVerifyForeignKey($lID, $strTable, $strKeyFN, $strRetiredFN, $strWhereExtra=''){
       $sqlStr =
          "SELECT COUNT(*) AS lNumRecs
           FROM $strTable
-          WHERE $strKeyFN=$lID AND NOT $strRetiredFN;";
+          WHERE $strKeyFN=$lID AND NOT $strRetiredFN $strWhereExtra;";
       $query = $this->db->query($sqlStr);
       $row =  $query->row();
       return($row->lNumRecs > 0);
    }
 
-
-
+   private function bVerifyPTableKey($lID, $enumAttachType){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      switch ($enumAttachType){
+         case CENUM_CONTEXT_PEOPLE:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'people_names', 'pe_lKeyID', 'pe_bRetired', ' AND NOT pe_bBiz ');
+            break;
+         case CENUM_CONTEXT_BIZ:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'people_names', 'pe_lKeyID', 'pe_bRetired', ' AND pe_bBiz ');
+            break;
+         case CENUM_CONTEXT_CLIENT:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'client_records', 'cr_lKeyID', 'cr_bRetired');
+            break;
+         case CENUM_CONTEXT_GIFT:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'gifts', 'gi_lKeyID', 'gi_bRetired', ' AND gi_lSponsorID IS NULL');
+            break;
+         case CENUM_CONTEXT_SPONSORSHIP:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'sponsor', 'sp_lKeyID', 'sp_bRetired');
+            break;
+         case CENUM_CONTEXT_USER:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'admin_users', 'us_lKeyID', 'us_bInactive');
+            break;
+         case CENUM_CONTEXT_VOLUNTEER:
+            $bFKeyOK = $this->bVerifyForeignKey($lID, 'volunteers', 'vol_lKeyID', 'vol_bRetired');
+            break;
+         default:
+            screamForHelp($enumAttachType.': invalid data type<br>error on line <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+      return($bFKeyOK);
+   }
 
    function reviewPeopleBizCSV($userCSV){
    //---------------------------------------------------------------------
@@ -655,23 +1093,7 @@ class mimport extends CI_Model{
    //---------------------------------------------------------------------
       $strTTableName = 'tmpImportReview';
       $this->createTempReviewTable($strTTableName);
-//$bFirst = true; $lCnt = 0;
       foreach($userCSV as $rec){
-/*
-if ($bFirst){
-// -------------------------------------
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$this->importFields   <pre>');
-echo(htmlspecialchars( print_r($this->importFields, true))); echo('</pre></font><br>');
-// -------------------------------------
-// -------------------------------------
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$rec   <pre>');
-echo(htmlspecialchars( print_r($rec, true))); echo('</pre></font><br>');
-// -------------------------------------
-$bFirst = false;
-}
-*/
 
          $strInsert = '';
          foreach ($this->importFields as $field){
@@ -686,26 +1108,11 @@ $bFirst = false;
             if (!is_null($strDBField)){
                $strInsert .= ",\n $strDBField = ".strPrepStr($varUserValue)." ";
             }
-/*
-if ( $strDBField=='strLName'){
-   $strDebug = '';
-   for ($ii=0; $ii<strlen($varUserValue); ++$ii){
-      $myChar = substr($varUserValue, $ii, 1);
-      $strDebug .= '"'.$myChar.'": '.ord($myChar).' ';
-   }
-   echoT($varUserValue.': '.$strDebug."<br>\n");
-}
-*/
          }
          if ($strInsert != ''){
             $sqlStr = "INSERT INTO $strTTableName SET ".substr($strInsert, 1).';';
             $query = $this->db->query($sqlStr);
          }
-/*
-$zzzlPos = @strrpos(__FILE__, '\\'); $zzzlLen=strlen(__FILE__); echo('<font class="debug">'.substr(__FILE__, @strrpos(__FILE__, '\\',-(($zzzlLen-$zzzlPos)+1))) .': '.__LINE__
-.": $lCnt \$strInsert = $strInsert <br></font>\n"); ++$lCnt;
-if ($lCnt>60) die;
-*/
       }
 
          // now review the import file with existing people
@@ -723,11 +1130,6 @@ if ($lCnt>60) die;
                      SET strNotes=".strPrepStr($strNotes).',
                         strCode = '.strPrepStr($strCode)."
                      WHERE lKeyID=$lRecID;";
-/*
-$zzzlPos = strrpos(__FILE__, '\\'); $zzzlLen=strlen(__FILE__);
-$zzzstrFile=substr(__FILE__, strrpos(__FILE__, '\\',-(($zzzlLen-$zzzlPos)+1)));
-echoT('<font class="debug">'.$zzzstrFile.' Line: <b>'.__LINE__.":</b><br><b>\$sqlUpdate=</b><br>".nl2br(htmlspecialchars($sqlUpdate))."<br><br></font>\n");
-*/
                $query = $this->db->query($sqlUpdate);
             }
          }
@@ -764,12 +1166,6 @@ echoT('<font class="debug">'.$zzzstrFile.' Line: <b>'.__LINE__.":</b><br><b>\$sq
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
-/* -------------------------------------
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$row   <pre>');
-echo(htmlspecialchars( print_r($row, true))); echo('</pre></font><br>');
-// ------------------------------------- */
-
       $strOut = '';
       if (($row->strFName != '') && ($row->strLName != '')){
          $strOut .= $this->strReviewNameInfo($row, $strCode);
@@ -969,20 +1365,89 @@ echo(htmlspecialchars( print_r($row, true))); echo('</pre></font><br>');
          P e r s o n a l i z e d   T a b l e   I m p o r t
       --------------------------------------------------------- */
 
-   function strParentTableDDL($enumMatch){
+   function strParentTableDDL($enumMatch, &$lNumAvail){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
-      $strOut = '
-         <option value="-1">&nbsp;</option>
-         <option value="'.CENUM_CONTEXT_PEOPLE.'"      '.($enumMatch == CENUM_CONTEXT_PEOPLE      ? 'selected' : '').'>People</option>
-         <option value="'.CENUM_CONTEXT_VOLUNTEER.'"   '.($enumMatch == CENUM_CONTEXT_VOLUNTEER   ? 'selected' : '').'>Volunteer</option>
-         <option value="'.CENUM_CONTEXT_BIZ.'"         '.($enumMatch == CENUM_CONTEXT_BIZ         ? 'selected' : '').'>Business/Organization</option>
-         <option value="'.CENUM_CONTEXT_CLIENT.'"      '.($enumMatch == CENUM_CONTEXT_CLIENT      ? 'selected' : '').'>Client</option>
-         <option value="'.CENUM_CONTEXT_SPONSORSHIP.'" '.($enumMatch == CENUM_CONTEXT_SPONSORSHIP ? 'selected' : '').'>Sponsors</option>
-         <option value="'.CENUM_CONTEXT_STAFF.'"       '.($enumMatch == CENUM_CONTEXT_STAFF       ? 'selected' : '').'>Users/Staff Members</option>
-         ';
-      return($strOut);
+      $lNumAvail = 0;
+      $cschema = new muser_schema;
+      $enumAttachType = array(
+                  CENUM_CONTEXT_BIZ,
+                  CENUM_CONTEXT_CLIENT,
+                  CENUM_CONTEXT_GIFT,
+                  CENUM_CONTEXT_PEOPLE,
+                  CENUM_CONTEXT_SPONSORSHIP,
+                  CENUM_CONTEXT_USER,
+                  CENUM_CONTEXT_VOLUNTEER
+                 );
+      $cschema->loadUFSchemaViaAttachType($enumAttachType, false);
+      if ($cschema->lNumTables == 0) return(null);
+
+      $strOut = "\n".'<option value="-1">&nbsp;</option>'."\n";
+
+      foreach ($cschema->schema as $pTable){
+         if ($pTable->lNumFields > 0){
+            $strOut .=
+                 '<option value="'.$pTable->lTableID.'">['
+                          .strXlateContext($pTable->enumAttachType, true, false).'] '
+                          .htmlspecialchars($pTable->strUserTableName)
+                .'</option>'."\n";
+            ++$lNumAvail;
+         }
+      }
+
+      if ($lNumAvail > 0){
+         return($strOut);
+      }else {
+         return(null);
+      }
    }
+
+   function xlateUField2IField($enumFType, &$enumIType, &$lSize, &$strDefault){
+   //---------------------------------------------------------------------
+   // translate personalized field type to import type
+   //---------------------------------------------------------------------
+      switch ($enumFType){
+         case CS_FT_CHECKBOX:  $enumIType = 'YesNo';     $lSize = 10;  $strDefault = 'No';         break;
+         case CS_FT_DDL:       $enumIType = 'genList';   $lSize = 255; $strDefault = '';           break;
+         case CS_FT_DDLMULTI:  $enumIType = 'mgenList';  $lSize = 255; $strDefault = '';           break;
+         case CS_FT_DATE:      $enumIType = 'mysqlDate'; $lSize = 40;  $strDefault = '0000-00-00'; break;
+         case CS_FT_CURRENCY:  $enumIType = 'currency';  $lSize = 40;  $strDefault = '0.0';        break;
+         case CS_FT_TEXTLONG:  $enumIType = 'text';      $lSize = 0;   $strDefault = '';           break;
+         case CS_FT_TEXT255:   $enumIType = 'text';      $lSize = 255; $strDefault = '';           break;
+         case CS_FT_TEXT80:    $enumIType = 'text';      $lSize = 80;  $strDefault = '';           break;
+         case CS_FT_TEXT20:    $enumIType = 'text';      $lSize = 20;  $strDefault = '';           break;
+         case CS_FT_INTEGER:   $enumIType = 'int';       $lSize = 20;  $strDefault = '';           break;
+         case CS_FT_CLIENTID:  $enumIType = 'clientID';  $lSize = 20;  $strDefault = '';           break;
+         default:
+            screamForHelp($enumFType.': invalid field type<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+   }
+
+   private function insertUpdateUTable($utable, $sqlSet, $lFKeyID){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $sqlStr =
+         'SELECT '.$utable->strDataTableKeyID.' AS lKeyID
+          FROM '.$utable->strDataTableName.'
+          WHERE '.$utable->strDataTableFID."=$lFKeyID;";
+      $query = $this->db->query($sqlStr);
+      if ($query->num_rows() > 0){
+         $row = $query->row();
+         $lKeyID = (int)$row->lKeyID;
+         $sqlStr = 'UPDATE '.$utable->strDataTableName.' SET '.$sqlSet.' WHERE '.$utable->strDataTableKeyID." = $lKeyID;";
+         $this->db->query($sqlStr);
+      }else {
+         $sqlStr = 'INSERT INTO '.$utable->strDataTableName.' SET '.$sqlSet.';';
+         $this->db->query($sqlStr);
+         $lKeyID = $this->db->insert_id();
+      }
+      return($lKeyID);
+   }
+
+
+
 
 }

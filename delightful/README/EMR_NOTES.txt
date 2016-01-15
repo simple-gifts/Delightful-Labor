@@ -21,5 +21,11 @@ Source Documents
 
                 OFC: http://www.who.int/childgrowth/standards/hc_for_age/en/index.html
 
-- John Zimmerman
-11/7/2013
+- John Zimmerman    11/7/2013
+
+================
+
+Note: In a previous project we have developed charts that overlay children's developmental milestones with the WHO
+growth charts. The feature hasn't been fully developed in Delightful Labor, but if your organization has a need
+for this, please contact us at info@DelightfulLabor.com
+- John Zimmerman  1/1/2016
