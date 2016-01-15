@@ -1,4 +1,7 @@
 <?php
+/*
+      $this->load->helper('clients/client_sponsor');
+*/
 
    function strSponsorSummaryViaCID($bTerse, $clsClient){
    //-----------------------------------------------------------------

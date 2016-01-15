@@ -22,13 +22,12 @@ function showPayRec($clsRpt, &$pRec, $lSponID, $lFPayerID, $lPayID){
              .strLinkRem_SponsorPayment($lSponID, $lPayID, 'Remove payment', true, true)
              );
 
-//   $pRec = $clsSCP->paymentRec;
    echoT(
        $clsRpt->openReport()
 
       .$clsRpt->openRow   ()
       .$clsRpt->writeLabel('Payment ID:')
-      .$clsRpt->writeCell (str_pad($lPayID, 5, '0', STR_PAD_LEFT))
+      .$clsRpt->writeCell (str_pad($lPayID, 5, '0', STR_PAD_LEFT), '', '', 1, 1, 'id="sponPayID"')
       .$clsRpt->closeRow  ());
 
    echoT(

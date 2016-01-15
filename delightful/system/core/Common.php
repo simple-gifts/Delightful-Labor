@@ -253,8 +253,8 @@ if ( ! function_exists('get_config'))
 				}
 			}
 		}
-
-		return $_config[0] =& $config;
+      $hold = @$_config[0] =& $config;   // jpz silences an error reporting notice in php 5.6
+		return($hold);
 	}
 }
 

@@ -28,6 +28,8 @@ class assign_db extends CI_CONTROLLER {
       $bConnectErr = $strConnectErr == 'true';
       $bDBSelErr   = $strDBSelErr   == 'true';
       $bDBOtherErr = $strOtherError == 'true';
+      
+      date_default_timezone_set('America/Chicago');
 
       if ($bConnectErr){
          $displayData['strErr'] = '<b>Unable to create a database connection!</b><br><br>

@@ -20,9 +20,9 @@ $config['dl_addExportRptInfo']    = true;
 $config['dl_reminderPreviewDays'] = 30;     // for reminders set for a future date, 
                                              // how many days preview do you want?  
 
-$config['dl_dbLevel']             = 1.013;         // do not change! 
-$config['dl_softwareLevel']       = 2.009;         // do not change! 
-$config['dl_softwareDate']        = '2015-12-31';  // do not change! 
+$config['dl_dbLevel']             = 1.014;         // do not change! 
+$config['dl_softwareLevel']       = 2.010;         // do not change! 
+$config['dl_softwareDate']        = '2016-01-15';  // do not change! 
 
 
 /*

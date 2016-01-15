@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------
  Delightful Labor!
 
- copyright (c) 2011-2015 by Database Austin
+ copyright (c) 2011-2016 by Database Austin
 
  This software is provided under the GPL.
  Please see http://www.gnu.org/copyleft/gpl.html for details.
@@ -53,7 +53,7 @@ class muser_schema extends CI_Model{
       if (!$bShowHidden){
          $this->sqlWhereExtra .= ' AND NOT pft_bHidden ';
       }
-      $this->loadUFSchema($bIncludePerms);
+      $this->loadUFSchema($bIncludePerms, 'LOWER(pft_enumAttachType), pft_strUserTableName, pft_lKeyID');
    }
 
    function loadUFSchemaViaAttachTypeUserTabName($enumAttachType, $strUserTabName, &$lTableID, $bFreakIfNotFound = false){
@@ -75,7 +75,7 @@ class muser_schema extends CI_Model{
       $lTableID = key($this->schema);
    }
 
-   function loadUFSchema($bIncludePerms=false){
+   function loadUFSchema($bIncludePerms=false, $strOrderBy=''){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
@@ -85,6 +85,10 @@ class muser_schema extends CI_Model{
       if ($bIncludePerms){
          $perms = new mpermissions;
          $perms->loadUserAcctInfo($glUserID, $acctAccess);
+      }
+
+      if ($strOrderBy==''){
+         $strOrderBy = 'pft_strUserTableName, pft_lKeyID';
       }
 
       $sqlStr =
@@ -98,8 +102,7 @@ class muser_schema extends CI_Model{
                pft_strVModEntryPoint
             FROM uf_tables
             WHERE NOT pft_bRetired '.$this->sqlWhereExtra.'
-            ORDER BY pft_strUserTableName, pft_lKeyID;';
-
+            ORDER BY '.$strOrderBy.';';
       $query = $this->db->query($sqlStr);
 
       $this->lNumTables = $lNumTables = $query->num_rows();
@@ -403,7 +406,7 @@ class muser_schema extends CI_Model{
          }
       }
    }
-   
+
    public function lDDLItemIDViaUserName($lTableID, $lFieldIDX, $strUserName, $bFreakIfNotFound=true){
    //---------------------------------------------------------------------
    // caller must previously load tables and ddl entires.
@@ -412,7 +415,7 @@ class muser_schema extends CI_Model{
    //   $cSchema->loadDDLValues($lTableID);
    //   $lLocationIDX = $cSchema->lFieldIDX_ViaUserFieldName($lTableID, 'Location', true);
    //   $lDDLEntryID = $cSchema->lDDLItemIDViaUserName($lTableID, $lLocationIDX, 'Other', true);
-   //---------------------------------------------------------------------    
+   //---------------------------------------------------------------------
       foreach ($this->schema[$lTableID]->fields[$lFieldIDX]->ddlInfo as $ddlEntry){
          if ($ddlEntry->strDDLEntry == $strUserName){
             return($ddlEntry->lKeyID);
@@ -422,7 +425,7 @@ class muser_schema extends CI_Model{
          screamForHelp('tableID: '.$lTableID.' fieldIDX: '.$lFieldIDX.' '.$strUserName.': ddl entry not found<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
       }else {
          return(null);
-      }   
+      }
    }
 
    public function loadDDLField($lFieldID, &$lNumDDL, &$ddlInfo){

@@ -13,8 +13,6 @@ if ($lNumTotLogins==1){
      '<ul>
         <li>The Delightful Labor <b>user\'s guide</b> can be found '
                    .anchor('http://www.delightfullabor.com/userGuide/', 'here.', $strAttribute).'</li>
-        <li>The Delightful Labor <b>forum</b> can be found '
-                   .anchor('http://www.delightfullabor.com/forum/', 'here.', $strAttribute).'</li>
         <li>You can update your <b>user account</b>  '
                    .strLinkEdit_User($glUserID, 'here.', false, $strAttribute).'
         <li>You can update your <b>organization\'s information</b>  '

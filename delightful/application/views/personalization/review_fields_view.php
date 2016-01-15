@@ -258,19 +258,19 @@ function display_DDL_ProcOpts($clsUF, $clsField){
 //---------------------------------------------------------------------
 //
 //---------------------------------------------------------------------
-
+   $lFieldID = $clsField->pff_lKeyID;
    $clsUF->uf_ddl_info($clsField->pff_lKeyID);
 
    if ($clsUF->clsDDL_Info->pff_bConfigured) {
          echoT(
                 '<br>'.$clsUF->clsDDL_Info->lNumEntries.' items '
-          .strLinkConf_UFDDL($clsUF->lTableID, $clsField->pff_lKeyID,
+          .strLinkConf_UFDDL($clsUF->lTableID, $lFieldID,
                              'view/add/edit', false, ''));
    }else {
       echoT(
           '<br><br><font color="red"><b>NOT CONFIGURED!</b></font><br>'
-          .strLinkConf_UFDDL($clsUF->lTableID, $clsField->pff_lKeyID,
-                             'Click here to configure', false, ''));
+          .strLinkConf_UFDDL($clsUF->lTableID, $lFieldID,
+                             'Click here to configure', false, ' id="configList_'.$lFieldID.'" '));
    }
 }
 

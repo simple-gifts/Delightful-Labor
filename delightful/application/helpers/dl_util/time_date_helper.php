@@ -830,7 +830,7 @@ function bVerifyValidMonthDayYear($lMonth, $lDay, $lYear){
 
    if (   ($lDay   < 1    || $lDay   > 31)
        || ($lMonth < 1    || $lMonth > 12)
-       || ($lYear  < 1000 || $lYear  > 6500)) return(false);
+       || ($lYear  < 0000 || $lYear  > 6500)) return(false);
 
    if (($lMonth == 2) && ($lDay > 29)) return(false);
 
@@ -1534,6 +1534,7 @@ function bValidMySQLDate($strDate){
    if (!is_numeric($dateFields[0])) return(false);
    if (!is_numeric($dateFields[1])) return(false);
    if (!is_numeric($dateFields[2])) return(false);
+   
    return(bVerifyValidMonthDayYear((integer)$dateFields[1], (integer)$dateFields[2], (integer)$dateFields[0]));
 }
 

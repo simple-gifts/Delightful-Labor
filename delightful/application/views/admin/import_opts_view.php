@@ -7,14 +7,22 @@
    $clsForm->bValueEscapeHTML = false;
 
    $attributes = array('name' => 'frmUpload');
-   echoT(form_open_multipart('admin/import/importPrep/'.$enumImportType, $attributes));
+   echoT(form_open_multipart('admin/import/importPrep/'.$enumImportType.'/'.$lTableID, $attributes));
 
 
    openBlock('Import '.strUpFirst($enumImportType).' Records', '');
    echoT('<table class="enpView">');
 
+   if ($bPTableImport){
+      $clsForm->strStyleExtraLabel = 'padding-top: 2px;';
+      echoT($clsForm->strLabelRow('Personalized Table',
+                       '['.strXlateContext($utable->enumAttachType, true, false).'] '
+                       .htmlspecialchars($utable->strUserTableName), 
+                       1));   
+   }
+   
    $clsForm->strExtraFieldText = form_error('userfile');
-   $clsForm->strStyleExtraLabel = 'padding-top: 10px;';
+   $clsForm->strStyleExtraLabel = 'padding-top: 6px;';
    echoT($clsForm->strLabelRow('Import file (.csv)',
                        '<input type="file" name="userfile" size="80" />', 1));
 
@@ -23,6 +31,7 @@
       echoT($clsForm->strLabelRow('Add imported records<br>to group(s)',
                        $ddlGroups, 1));   
    }
+   
 
       //----------------------
       // submit

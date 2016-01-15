@@ -1,4 +1,12 @@
 <?php
+/*---------------------------------------------------------------------
+// copyright (c) 2012-2016 Database Austin
+//
+// author: John Zimmerman
+//
+// This software is provided under the GPL.
+// Please see http://www.gnu.org/copyleft/gpl.html for details.
+--------------------------------------------------------------------- */
    global $gclsChapterVoc;
 
    if ($bNew){
@@ -39,8 +47,15 @@ function showAccountType(&$clsForm, $lTableWidth, $lLabelWidth, $strLabel, &$use
       //------------------------
       // Admin user?
       //------------------------
-   $clsForm->strStyleExtraLabel = 'vertical-align: top; padding-top: 3pt; width: '.$lLabelWidth.'pt;';
+   $clsForm->strStyleExtraLabel = 'vertical-align: top; padding-top: 4pt; width: '.$lLabelWidth.'pt;';
    if ($bAsAdmin){
+      $strRadioDebug =
+         '<input type="radio" name="rdoDebug" value="true" ' .($userRec->bDebugger  ? 'checked' : '').'
+                  >Yes&nbsp;<i>(access to debug info)</i>&nbsp;'
+        .'<input type="radio" name="rdoDebug" value="false" ' .($userRec->bDebugger ? '' : 'checked').'
+                  >No&nbsp;<i>(recommended)</i>';
+      echoT($clsForm->strLabelRow('Developer', $strRadioDebug, 1));
+
       $strRadio =
          '<input type="radio" name="rdoAcctType" value="admin" '.($userRec->bAdmin        ? 'checked' : '').'
                   onClick="hideShowDiv(\'volPerms\', true); hideShowDiv(\'userPerms\', true);">Administrator&nbsp;&nbsp;'
@@ -51,7 +66,6 @@ function showAccountType(&$clsForm, $lTableWidth, $lLabelWidth, $strLabel, &$use
       echoT($clsForm->strLabelRow('Account Type', $strRadio, 1));
       showUserPerms($userRec, $clsForm);
       showVolPerms($userRec, $clsForm);
-
    }else {
       if ($userRec->bAdmin){
          $strAcctType = 'Administrator';
@@ -73,18 +87,18 @@ function showVolPerms(&$userRec, &$clsForm){
 //
 //---------------------------------------------------------------------
    global $gclsChapterVoc;
-   
+
    $strVolPerm =
       '<i>Volunteer accounts have limited access to <b>Delightful Labor</b>. You can set<br>
           what information is accessible. Registered volunteers can only access their own records.</i><br>'."\n";
-          
-          
+
+
    $strVolPerm .=
       '<input type="checkbox" name="chkVolEditContactInfo" value="true" '
                      .($userRec->bVolEditContact ? 'checked' : '').'>Edit contact info<br>'."\n"
      .'<input type="checkbox" name="chkVolVolPassReset" value="true" '
                      .($userRec->bVolPassReset ? 'checked' : '').'>Reset password<br>'."\n";
-                     
+
    $strVolPerm .=
       '<input type="checkbox" name="chkVolViewGiftHistory" value="true" '
                      .($userRec->bVolViewGiftHistory ? 'checked' : '').'>View donation history<br>'."\n";
@@ -97,10 +111,10 @@ function showVolPerms(&$userRec, &$clsForm){
                      .($userRec->bVolAddVolHours ? 'checked' : '').'>Add / Edit volunteer hours<br>'."\n"
      .'<input type="checkbox" name="chkVolShiftSignup" value="true" '
                      .($userRec->bVolShiftSignup ? 'checked' : '').'>View upcoming events / register for shifts<br>'."\n";
-                    
+
       // optional peopleID
    $strVolPerm .= form_error('txtPID');
-                    
+
    $strVolPerm .=
       '<span style="vertical-align: center;">'
          .'<input type="text" name="txtPID" style="width: 30pt; text-align:right;" value="'.$userRec->txtPID.'"> People ID (optional)'

@@ -7,6 +7,10 @@ RELEASE INFORMATION
 -------------------
     date         software ver.     db ver.    notes
     ----------   -------------   ----------   ---------------------------------------------
+    2016-01-15      2.010          1.014      - added the ability to set person as volunteer during people import
+                                              - personalized table imports
+                                              - admins can now set developer mode directly from account edit
+    
     2015-12-18      2.009          1.013      - corrected bug in volunteer hours report (last volunteer total
                                                 not displayed)
                                               - added Volunteer Hours by Time Frame Summary report

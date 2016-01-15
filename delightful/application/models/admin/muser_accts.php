@@ -1,6 +1,6 @@
 <?php
 /*---------------------------------------------------------------------
-// copyright (c) 2012-2015 Database Austin
+// copyright (c) 2012-2016 Database Austin
 //
 // author: John Zimmerman
 //
@@ -665,6 +665,7 @@ class muser_accts extends CI_Model{
             us_enumMeasurePref = '.strPrepStr($uRec->us_enumMeasurePref).',
 
             us_bAdmin          = '.($uRec->us_bAdmin          ? '1' : '0').',
+            us_bDebugger       = '.($uRec->us_bDebugger       ? '1' : '0').',
 
             us_lPeopleID       = '.(is_null($uRec->lPeopleID) ? 'null' : (int)$uRec->lPeopleID).',
 

@@ -19,6 +19,7 @@
       global $glUserID, $gbAdmin;
 
       $local =& get_instance();
+      $local->load->helper('dl_util/time_date');
 
       if ($bAsAdmin){
          if (!bTestForURLHack('adminOnly')) return;
@@ -156,10 +157,11 @@
    ---------------------------------------------------------------------*/
       global $glUserID;
 
+      $bSelfSame = $glUserID == $lUserID;
       if ($bAsAdmin){
          if (!bTestForURLHack('adminOnly')) return;
       }else {
-         if ($glUserID != $lUserID) {
+         if (!$bSelfSame) {
             bTestForURLHack('forceFail');
             return;
          }
@@ -203,8 +205,8 @@
       }
 
       $local->form_validation->set_rules('rdoAcctType');
-      $local->form_validation->set_rules('rdoAcctType');
-      $local->form_validation->set_rules('rdoAcctType');
+//      $local->form_validation->set_rules('rdoAcctType');
+      $local->form_validation->set_rules('rdoDebug');
 
          // volunteer permissions
       $local->form_validation->set_rules('chkVolEditContactInfo');
@@ -278,6 +280,7 @@
             $displayData['userRec']->enumMeasurePref      = htmlspecialchars($userRec->us_enumMeasurePref);
 
             $displayData['userRec']->bAdmin               = $userRec->us_bAdmin;
+            $displayData['userRec']->bDebugger            = $userRec->us_bDebugger;
             $displayData['userRec']->bStandardUser        = $userRec->bStandardUser;
             $displayData['userRec']->bVolAccount          = $userRec->bVolAccount;
 
@@ -325,6 +328,7 @@
             $displayData['userRec']->enumDateFormat  = set_value('rdoDateFormat');
             $displayData['userRec']->enumMeasurePref = set_value('rdoMeasureFormat');
 
+            $displayData['userRec']->bDebugger           = set_value('rdoDebug')=='true';
             $displayData['userRec']->bAdmin              = set_value('rdoAcctType')=='admin';
             $displayData['userRec']->bStandardUser       = set_value('rdoAcctType')=='user';
             $displayData['userRec']->bVolAccount         = set_value('rdoAcctType')=='vol';
@@ -378,6 +382,7 @@
          $userRec->us_enumMeasurePref = xss_clean(trim($_POST['rdoMeasureFormat']));
 
          if ($bAsAdmin){
+            $userRec->us_bDebugger       = $_POST['rdoDebug']=='true';
             $userRec->us_bAdmin          = $_POST['rdoAcctType']=='admin';
             $userRec->bStandardUser      = $_POST['rdoAcctType']=='user';
             $userRec->bVolAccount        = $_POST['rdoAcctType']=='vol';
@@ -450,8 +455,11 @@
 
          if ($bAsAdmin) {
             $userRec->us_strUserPWord = xss_clean(trim($_POST['txtPWord1']));
+            $_SESSION[CS_NAMESPACE.'user']->bDebugger = $userRec->us_bDebugger;
          }else {
             $userRec->us_strUserPWord = '';
+         }
+         if (!$bAsAdmin || $bSelfSame){
             $_SESSION[CS_NAMESPACE.'user']->enumDateFormat  = $userRec->us_enumDateFormat;
             $_SESSION[CS_NAMESPACE.'user']->enumMeasurePref = $userRec->us_enumMeasurePref;
             $_SESSION[CS_NAMESPACE.'user']->strFirstName    = $userRec->us_strFirstName;

@@ -145,6 +145,46 @@ td.enpRptRequired {
 }
 
 /*------------------------
+   Simple Table
+--------------------------*/
+table.dlView {
+  border:1px solid #c3c3c3; 
+  border-collapse:collapse;
+}
+td.dlViewTitle {
+  font-family: Arial, Verdana, Sans-Serif;  
+  border:1px solid #c3c3c3;
+  font-size: 11pt;
+  text-align: left;
+  vertical-align: top;
+  font-weight: bold;
+  background-color:#fff;
+  padding:3px;
+  vertical-align:top;
+}
+td.dlViewLabel {
+  font-family: Arial, Verdana, Sans-Serif;  
+  font-size: 10pt;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: top;
+  border:1px solid #c3c3c3;
+  background-color:#fff;
+  padding:3px;
+  vertical-align:top;
+}
+td.dlView {
+  font-family: Arial, Verdana, Sans-Serif;  
+  font-size: 9pt;
+  border:1px solid #c3c3c3;
+  text-align: left;
+  vertical-align: top;
+  padding:3px;
+  vertical-align:top;
+}
+
+
+/*------------------------
    Generic view
 --------------------------*/
 table.enpView {

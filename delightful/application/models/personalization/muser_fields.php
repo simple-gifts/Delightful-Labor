@@ -256,18 +256,26 @@ class muser_fields extends CI_Model{
             );
    }
 
+   public function strGenUF_KeyIDFN($lTableID){
+   //---------------------------------------------------------------------
+   // return a prefix for the user-defined field, based on the tableID and
+   // field ID (for fields other than ddl, log)
+   //
+   // sample output:
+   //    'uf000123_lKeyID'
+   //---------------------------------------------------------------------
+      return('uf'.str_pad($lTableID.'', 6, '0', STR_PAD_LEFT).'_lKeyID');
+   }
+   
    public function strGenUF_ForeignIDFN($lTableID){
    //---------------------------------------------------------------------
    // return a prefix for the user-defined field, based on the tableID and
    // field ID (for fields other than ddl, log)
    //
    // sample output:
-   //    'uf000123_023412'
+   //    'uf000123_lForeignKey'
    //---------------------------------------------------------------------
-      return(
-               'uf'.str_pad($lTableID.'', 6, '0', STR_PAD_LEFT)
-              .'_lForeignKey'
-            );
+      return('uf'.str_pad($lTableID.'', 6, '0', STR_PAD_LEFT).'_lForeignKey');
    }
 
    public function loadTablesViaTType($bExcludeHidden=true){
@@ -1693,7 +1701,7 @@ class muser_fields extends CI_Model{
       $strOut .=
           $clsRpt->openRow()
          .$clsRpt->writeLabel('Table ID:', '75pt')
-         .$clsRpt->writeCell(str_pad($utable->lKeyID, 5, '0', STR_PAD_LEFT))
+         .$clsRpt->writeCell(str_pad($utable->lKeyID, 5, '0', STR_PAD_LEFT), '', '', 1, 1, ' id="pTabSummaryID" ')
          .$clsRpt->closeRow();
 
       $strOut .=
