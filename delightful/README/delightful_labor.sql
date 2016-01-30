@@ -7,7 +7,7 @@
 #  This software is provided under the GPL.
 #  Please see http://www.gnu.org/copyleft/gpl.html for details.
 #
-#  Delightful Labor sql version 1.014 2016-01-15
+#  Delightful Labor sql version 1.015 2016-01-30
 # --------------------------------------------------------------------
 
 
@@ -101,8 +101,8 @@ CREATE TABLE `admin_chapters` (
   `ch_strTaxID`         varchar(80)  NOT NULL,
   `ch_lDefaultACO`      int(11)      NOT NULL DEFAULT '1' COMMENT 'foreign key to table admin_aco',
   `ch_vocZip`           varchar(80)  NOT NULL DEFAULT 'Zip Code',
-  `ch_vocState`         varchar(80)  NOT NULL DEFAULT 'State',  
-  `ch_vocJobSkills`     varchar(80)  NOT NULL DEFAULT 'Job Skills',  
+  `ch_vocState`         varchar(80)  NOT NULL DEFAULT 'State',
+  `ch_vocJobSkills`     varchar(80)  NOT NULL DEFAULT 'Job Skills',
   `ch_bRetired`         tinyint(1)   NOT NULL DEFAULT '0',
   `ch_lOrigID`          int(11)      NOT NULL DEFAULT '0',
   `ch_lLastUpdateID`    int(11)      NOT NULL DEFAULT '0',
@@ -282,7 +282,8 @@ INSERT INTO `admin_version` (`av_lKeyID`, `av_sngVersion`, `av_strVersionNotes`)
 (15, '1.011', 'Custom Reports'),
 (16, '1.012', 'Vol. Job Codes'),
 (17, '1.013', 'Enhanced volunteer registration'),
-(18, '1.014', 'Enhanced importing features')
+(18, '1.014', 'Enhanced importing features'),
+(19, '1.015', 'Enhanced custom reports')
 ;
 
 # [BREAK]
@@ -398,7 +399,7 @@ CREATE TABLE `client_records` (
   `cr_strBio`              text NOT NULL,
   `cr_bNoLongerAtLocation` tinyint(1) NOT NULL DEFAULT '0',
   `cr_lAttributedTo`       int(11) DEFAULT NULL,
-  `cr_strImportID`         varchar(40) DEFAULT NULL,  
+  `cr_strImportID`         varchar(40) DEFAULT NULL,
   `cr_bRetired`            tinyint(1) NOT NULL DEFAULT '0',
   `cr_lOriginID`           int(11)    NOT NULL DEFAULT '0',
   `cr_lLastUpdateID`       int(11)    NOT NULL DEFAULT '0',
@@ -759,7 +760,6 @@ CREATE TABLE IF NOT EXISTS creport_search (
 # [BREAK]
 
 
-
 #
 # Table structure for table 'creport_sort'
 #
@@ -786,127 +786,7 @@ CREATE TABLE IF NOT EXISTS creport_sort (
      KEY crst_strFieldID (crst_strFieldID),
      KEY crst_lSortIDX   (crst_lSortIDX)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Sort terms for custom report' AUTO_INCREMENT=1 ;
-# [BREAK]
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#
-# TABLE STRUCTURE FOR: creport_dir
-#
-
-# [BREAK]
-DROP TABLE IF EXISTS creport_dir;
-# [BREAK]
-
-CREATE TABLE IF NOT EXISTS creport_dir (
-  crd_lKeyID        int(11)      NOT NULL AUTO_INCREMENT,
-  crd_strName       varchar(255) NOT NULL DEFAULT '',
-  crd_strNotes      text         NOT NULL,
-  crd_enumRptType   enum(
-                        'gifts','gifts/hon','gifts/mem','gifts/per',
-                        'clients',  'clients/cprog',  'clients/spon',  'clients/spon/pay'
-                    ) NOT NULL,
-  crd_bPrivate      tinyint(1) NOT NULL DEFAULT '0',
-
-  crd_bRetired      tinyint(1) NOT NULL DEFAULT '0',
-  crd_lOriginID     int(11)    NOT NULL DEFAULT '0',
-  crd_lLastUpdateID int(11)    NOT NULL DEFAULT '0',
-  crd_dteOrigin     datetime   NOT NULL DEFAULT '0000-00-00 00:00:00',
-  crd_dteLastUpdate timestamp  NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (crd_lKeyID),
-  KEY crd_lOriginID   (crd_lOriginID),
-  KEY crd_enumRptType (crd_enumRptType)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Custom report directory' AUTO_INCREMENT=1 ;
-
-# [BREAK]
-
-#
-# Table structure for table 'creport_fields'
-#
-
-DROP TABLE IF EXISTS creport_fields;
-
-# [BREAK]
-
-CREATE TABLE IF NOT EXISTS creport_fields (
-  crf_lKeyID        int(11) NOT NULL AUTO_INCREMENT,
-  crf_lReportID     int(11) NOT NULL DEFAULT '0' COMMENT 'Foreign key to creport_dir',
-
-  crf_lFieldID      int(11)  DEFAULT NULL COMMENT 'Foreign key to uf_fields; if null - parent table',
-  crf_lTableID      int(11)  DEFAULT NULL COMMENT 'Foreign key to uf_tables',
-  crf_strTableName  varchar(255) NOT NULL DEFAULT '',
-  crf_strFieldName  varchar(255) DEFAULT NULL COMMENT 'For parent table fields',
-  crf_lSortIDX       int(11)  NOT NULL DEFAULT '0',
-
-  crf_lOriginID     int(11) NOT NULL DEFAULT '0',
-  crf_lLastUpdateID int(11) NOT NULL DEFAULT '0',
-  crf_dteOrigin     datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-  crf_dteLastUpdate timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (crf_lKeyID),
-  KEY crf_lReportID   (crf_lReportID),
-  KEY crf_lFieldID (crf_lFieldID),
-  KEY crf_lTableID (crf_lTableID),
-  KEY crf_lSortIDX (crf_lSortIDX)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Fields for custom report' AUTO_INCREMENT=1 ;
-
-# [BREAK]
-
-#
-# Table structure for table 'creport_search'
-#
-
-DROP TABLE IF EXISTS creport_search;
-
-# [BREAK]
-
-CREATE TABLE IF NOT EXISTS creport_search (
-   crs_lKeyID             int(11) NOT NULL AUTO_INCREMENT,
-   crs_lReportID          int(11) NOT NULL DEFAULT '0' COMMENT 'Foreign key to creport_dir',
-   crs_lFieldID           int(11) NOT NULL DEFAULT  '0',
-   crs_lTableID           int(11) NOT NULL DEFAULT  '0',
-   crs_strFieldID         VARCHAR (255) NOT NULL DEFAULT  '',
-   crs_lNumLParen         SMALLINT(  5) NOT NULL DEFAULT  '0',
-   crs_lNumRParen         SMALLINT(  5) NOT NULL DEFAULT  '0',
-   crs_lSortIDX           SMALLINT(  5) NOT NULL DEFAULT  '0',
-   crs_lCompareOpt        SMALLINT(  5) NOT NULL DEFAULT  '0',
-   crs_bCompareBool       TINYINT (  1)   DEFAULT  NULL,
-   crs_lCompVal           INT     ( 11)   DEFAULT NULL,
-   crs_curCompVal         DECIMAL (10, 2) DEFAULT NULL,
-   crs_strCompVal         VARCHAR (255)   DEFAULT NULL,
-   crs_dteCompVal         DATE            DEFAULT NULL,
-   crs_bNextTermBoolAND   TINYINT (  1) NOT NULL DEFAULT  '0',
-   crs_lOriginID          int(11) NOT NULL DEFAULT '0',
-   crs_lLastUpdateID      int(11) NOT NULL DEFAULT '0',
-   crs_dteOrigin          datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
-   crs_dteLastUpdate      timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (crs_lKeyID),
-     KEY crs_lReportID  (crs_lReportID),
-     KEY crs_lTableID   (crs_lTableID),
-     KEY crs_lFieldID   (crs_lFieldID),
-     KEY crs_strFieldID (crs_strFieldID),
-     KEY crs_lSortIDX   (crs_lSortIDX)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COMMENT='Search terms for custom report' AUTO_INCREMENT=1 ;
 
 # [BREAK]
 
@@ -1619,7 +1499,7 @@ DROP TABLE IF EXISTS import_log;
 CREATE TABLE `import_log` (
   `il_lKeyID`         int(11) NOT NULL AUTO_INCREMENT,
   `il_enumImportType` enum('people','business','gift','sponsorPayment','personalizedTable','client') DEFAULT NULL,
-  `il_lUTableID`      int(11) DEFAULT NULL COMMENT 'Foreign key to uf_tables (for ptable imports only)',  
+  `il_lUTableID`      int(11) DEFAULT NULL COMMENT 'Foreign key to uf_tables (for ptable imports only)',
   `il_bRetired`       tinyint(1) NOT NULL DEFAULT '0',
   `il_lOriginID`      int(11) NOT NULL DEFAULT '0',
   `il_dteOrigin`      datetime NOT NULL DEFAULT '0000-00-00 00:00:00',

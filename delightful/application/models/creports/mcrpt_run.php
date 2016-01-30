@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------
 // Delightful Labor!
 //
-// copyright (c) 2014 by Database Austin
+// copyright (c) 2014-2016 by Database Austin
 // Austin, Texas
 //
 // This software is provided under the GPL.
@@ -47,11 +47,12 @@ class mcrpt_run extends mcrpt_search_terms{
 
          // tables needed for the report
       crptTables\tablesUsed($report, $this->terms, $sortTerms, $this->tableIDs);
-      
+
       $stTableIDs = array();
       crptTables\tableIDsSearchTerms($this->terms, $stTableIDs);
-      $stTableIDs = array_keys($stTableIDs);      
-      $this->singleEntryPTableReview($stTableIDs, $strSingleEntryWriteWhere);
+      $stTableIDs = array_keys($stTableIDs);
+
+      $strSingleEntryWriteWhere = '';
 
       $strFrom = $strSelect = $strWhere = $strOrder = array();
 
@@ -63,6 +64,32 @@ class mcrpt_run extends mcrpt_search_terms{
             $strWhereContext      = ' NOT cr_bRetired AND (';
             $strWhereContextClose = ' )';
             $strDefaultOrder = 'cr_lKeyID ';
+            break;
+         case CE_CRPT_PEOPLE:
+            $lNumFrom = 1;
+            $strFNKeyID = 'pe_lKeyID';
+            $strFrom[0] = 'FROM people_names';
+            $strWhereContext      = ' NOT pe_bRetired AND NOT pe_bBiz AND (';
+            $strWhereContextClose = ' )';
+            $strDefaultOrder = 'pe_lKeyID ';
+            break;
+         case CE_CRPT_BIZ:
+         case CE_CRPT_PEOPLE:
+            $lNumFrom = 1;
+            $strFNKeyID = 'pe_lKeyID';
+            $strFrom[0] = 'FROM people_names';
+            $strWhereContext      = ' NOT pe_bRetired AND '.($report->enumRptType==CE_CRPT_BIZ ? '' : 'NOT').' pe_bBiz AND (';
+            $strWhereContextClose = ' )';
+            $strDefaultOrder = 'pe_lKeyID ';
+            break;
+         case CE_CRPT_VOLUNTEER:
+            $lNumFrom = 2;
+            $strFNKeyID = 'vol_lKeyID';
+            $strFrom[0] = 'FROM volunteers';
+            $strFrom[1] = 'INNER JOIN people_names ON pe_lKeyID=vol_lPeopleID';
+            $strWhereContext      = ' NOT pe_bRetired AND NOT vol_bRetired AND NOT pe_bBiz AND (';
+            $strWhereContextClose = ' )';
+            $strDefaultOrder = 'vol_lKeyID, pe_lKeyID ';
             break;
          default:
             screamForHelp($report->enumRptType.': report not available<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
@@ -94,11 +121,12 @@ class mcrpt_run extends mcrpt_search_terms{
       if ($bTerminateSQL) $this->strSQL .= ';';
    }
 
-   function loadCReportRecords($fields, &$lNumRec, &$crecs){
+   function loadCReportRecords($bTestForBiz, $fields, &$lNumRec, &$crecs){
    //---------------------------------------------------------------------
    // call $this->strBuildCReportSQL($report, $strLimits, true) to create sql first.
    //---------------------------------------------------------------------
       $lNumRec = 0; $crecs = array();
+
       $query = $this->db->query($this->strSQL);
       $lNumRec = $query->num_rows();
       if ($lNumRec > 0){
@@ -108,6 +136,9 @@ class mcrpt_run extends mcrpt_search_terms{
             $crec = &$crecs[$idx];
             foreach ($fields as $field){
                $crec[$field->strSelectAsName] = $row[$field->strSelectAsName];
+            }
+            if ($bTestForBiz){
+               $crec['bBiz'] = (bool)$row['bBiz'];
             }
             ++$idx;
          }
@@ -395,15 +426,20 @@ class mcrpt_run extends mcrpt_search_terms{
       if (count($fields)==0) return;
 
       foreach ($fields as $field){
-         if ($field->enumType == CS_FT_DDL){
-            $strAsTable = 'ufddl'.$field->lFieldID;
-            $strFrom[] = 'LEFT JOIN uf_ddl AS '.$strAsTable.' ON '.$strAsTable.'.ufddl_lKeyID = '.$field->strFieldName;
-            $strSelect[] = $strAsTable.'.ufddl_strDDLEntry AS `'.$field->strSelectAsName.'`';
-            ++$lNumFrom;
-         }elseif ($field->enumType == CS_FT_DDL_SPECIAL){
-            crptDDL\ddl2sqlSpecial($field, $strSelect[], $strFrom[]);
-         }else {
-            $strSelect[] = $field->strFieldName.' AS `'.$field->strSelectAsName.'`';
+         if (!is_null($field->lKeyID)){
+            if ($field->enumType == CS_FT_DDL){
+               $strAsTable = 'ufddl'.$field->lFieldID;
+               $strFrom[] = 'LEFT JOIN uf_ddl AS '.$strAsTable.' ON '.$strAsTable.'.ufddl_lKeyID = '.$field->strFieldName;
+               $strSelect[] = $strAsTable.'.ufddl_strDDLEntry AS `'.$field->strSelectAsName.'`';
+               ++$lNumFrom;
+            }elseif ($field->enumType == CS_FT_DDL_SPECIAL){
+               crptDDL\ddl2sqlSpecial($field, $strSelect[], $strFrom[]);
+            }else {
+               $strSelect[] = $field->strFieldName.' AS `'.$field->strSelectAsName.'`';
+               if ($field->strFieldName == 'pe_lKeyID'){
+                  $strSelect[] = 'pe_bBiz AS `bBiz`';
+               }
+            }
          }
       }
    }

@@ -47,7 +47,15 @@ class search_terms extends CI_Controller {
       $enumRptType = $report->enumRptType;
       $displayData['contextSummary'] = $this->clsCReports->strCReportHTMLSummary();
 
-      $displayData['tables'] = $this->clsCReports->loadTableStructures($enumRptType);
+      $displayData['tables'] = $tables = $this->clsCReports->loadTableStructures($enumRptType);
+/* -------------------------------------
+echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
+   .': '.__LINE__.'<br>$tables   <pre>');
+echo(htmlspecialchars( print_r($tables, true))); echo('</pre></font><br>');
+// ------------------------------------- */
+      
+//         // for single entry tables, allow user to qualify based on if the record has been initialized (written)
+//      addField_CheckForWritten($tables);
 
          //-------------------------
          // validation rules
@@ -136,13 +144,19 @@ class search_terms extends CI_Controller {
       $displayData['contextSummary'] = $this->clsCReports->strCReportHTMLSummary();
 
       $tables = $this->clsCReports->loadTableStructures($enumRptType);
-      $this->clsCReports->findFieldInTables($strField, $tables, $lTableIDX, $lFieldIDX);
-      $table = &$tables[$lTableIDX];
-
+      $displayData['bCheckForWritten'] = $bCheckForWritten = bTestFor_CheckForWritten($strField);
+      if ($bCheckForWritten){         
+         $lTableIDX = lTableIDX_ViaTName_CFW($tables, substr($strField, 0, 9));
+         $table = &$tables[$lTableIDX];
+         $displayData['lFieldIDX'] = $lFieldIDX = createCFW_Field($table);
+      }else {
+         $this->clsCReports->findFieldInTables($strField, $tables, $lTableIDX, $lFieldIDX);
+         $table = &$tables[$lTableIDX];
+         $displayData['lFieldIDX'] = $lFieldIDX;
+      }
       $displayData['lFieldID']  = $lFieldID = $table->fields[$lFieldIDX]->lFieldID;
       $displayData['lTableID']  = $table->lTableID;
       $displayData['lTableIDX'] = $lTableIDX;
-      $displayData['lFieldIDX'] = $lFieldIDX;
 
          //-----------------------
          // search expression

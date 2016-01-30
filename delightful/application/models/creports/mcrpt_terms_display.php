@@ -63,15 +63,11 @@ class mcrpt_terms_display extends mcrpt_search_terms{
       if ($att->bShowSortLink){
          if ($this->lNumTerms > 1){
             $strOut .= strLinkEdit_CRptSearchFieldOrder($lReportID, 'Search order', false).'&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;';
-//                       strLinkEdit_CRptSearchFieldOrder($lReportID, 'Search order', true).'&nbsp;'
-//                      .strLinkEdit_CRptSearchFieldOrder($lReportID, 'Search order', false).'<br>';
          }
       }
 
       if ($att->bShowParenEditLink){
          $strOut .= strLinkEdit_CRptSearchFieldParens($lReportID, 'Parentheses', false).'<br>';
-//         $strOut .= strLinkEdit_CRptSearchFieldParens($lReportID, 'Parentheses', true).'&nbsp;'
-//                   .strLinkEdit_CRptSearchFieldParens($lReportID, 'Parentheses', false).'<br>';
       }
 
       $lMaxP = $this->lMaxParentheses();
@@ -79,6 +75,7 @@ class mcrpt_terms_display extends mcrpt_search_terms{
       $strOut .=
          '<table border="0" cellspacing="5">'."\n";
       $iFldCnt = 1; $idx = 0; $lMaxNumParen = 6;
+
       foreach ($this->terms as $term){
          $lFieldID = $term->lFieldID;
          $lTermID  = $term->lKeyID;
@@ -128,8 +125,13 @@ class mcrpt_terms_display extends mcrpt_search_terms{
          $strOut .= '&nbsp;</td>';
 
             // table and field name
+         if (isset($term->strAttachLabel)){
+            $strAttach = '<b>['.$term->strAttachLabel.']</b>&nbsp;';
+         }else {
+            $strAttach = '';
+         }
          $strOut .=
-             '<td style="font-weight: bold; font-size: 8pt;">['
+             '<td style="font-weight: bold; font-size: 8pt;">'.$strAttach.'['
                     .htmlspecialchars($term->strUserTableName).']
               </td>
               <td>'
@@ -289,7 +291,7 @@ class mcrpt_terms_display extends mcrpt_search_terms{
          $strID = ' id="idParen'.($bLeft?'L':'R').'_'.$lTermIDX.'_'.$idx.'" ';
          $bSetParen = $lNumParen>=$idx;
          $strTextName = $strTextNameBase.$idx;
-         $strOut .= 
+         $strOut .=
            '<input type="text" name="'.$strTextName.'" READONLY '.$strID
               .' style= "width: 10px; border: solid 1px #abf; text-align: center; '
                    .'font-size: 12pt; font-weight: bold;"

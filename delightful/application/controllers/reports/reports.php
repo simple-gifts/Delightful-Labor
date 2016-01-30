@@ -50,7 +50,7 @@ class reports extends CI_Controller {
       $this->load->helper('creports/creport_tables');
       $this->load->helper('personalization/field_display');
 
-      $this->load->model  ('admin/mpermissions', 'perms');
+      $this->load->model ('admin/mpermissions', 'perms');
       $this->load->model ('admin/madmin_aco');
       $this->load->model ('creports/mcreports');
       $this->load->model ('creports/mcrpt_search_terms');
@@ -73,8 +73,6 @@ class reports extends CI_Controller {
          vid_bTestFail($this, false, 'Permissions for Custom Report', $lReportID);
          return;
       }
-
-      $report = &$this->crptRun->reports[0];
 
       if (!$bExport){
          $displayData['contextSummary'] = $this->crptRun->strCReportHTMLSummary();
@@ -117,7 +115,7 @@ class reports extends CI_Controller {
 
          if ($lNumThisPage > 0){
             $this->crptRun->strSQL = $this->crptRun->strSQL."\nLIMIT $lStartRec, $lRecsPerPage;";
-            $this->crptRun->loadCReportRecords($report->fields, $displayData['lNumCRecs'], $displayData['crecs']);
+            $this->crptRun->loadCReportRecords($report->bTestForBiz, $report->fields, $displayData['lNumCRecs'], $displayData['crecs']);
          }
 
             //------------------------------------------------

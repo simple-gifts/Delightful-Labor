@@ -30,7 +30,7 @@
       if ($field->lTableID <= 0){
          $strTable = $field->strUserTableName;
       }else {
-         $strTable = '<b>['.$field->strAttachLabel.']</b> '.htmlspecialchars($field->strUserTableName);
+         $strTable = '<b>['.$field->strAttachLabel.']</b> ['.htmlspecialchars($field->strUserTableName).']';
       }
 
       echoT(

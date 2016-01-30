@@ -89,5 +89,16 @@ function strDBValueConvert_String($strValue){
    return($strValue);
 }
 
+function get_db_enum_values( $table, $field ){
+//---------------------------------------------------------------------
+// http://stackoverflow.com/questions/2350052/how-can-i-get-enum-possible-values-in-a-mysql-database
+//---------------------------------------------------------------------   
+    $CI =& get_instance();
+    $type = $CI->db->query( "SHOW COLUMNS FROM {$table} WHERE Field = '{$field}'" )->row( 0 )->Type;
+    preg_match("/^enum\(\'(.*)\'\)$/", $type, $matches);
+    $enum = explode("','", $matches[1]);
+    return $enum;
+}
+
 
 ?>

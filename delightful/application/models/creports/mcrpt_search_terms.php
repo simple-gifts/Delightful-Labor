@@ -112,7 +112,7 @@ class mcrpt_search_terms extends mcreports{
             $term->lKeyID            = (int)$row->crs_lKeyID;
             $term->lReportID         = (int)$row->crs_lReportID;
             $term->lTableID          = (int)$row->crs_lTableID;
-            $term->lFieldID          = (int)$row->crs_lFieldID;
+            $term->lFieldID          = $lFieldID = (int)$row->crs_lFieldID;
             $term->strFieldID        = $row->crs_strFieldID;
             if ($term->lTableID <=0 ){
                crptFieldPropsParentTable($term->lTableID, $term->strFieldID,
@@ -135,6 +135,19 @@ class mcrpt_search_terms extends mcreports{
             if ($term->lCurrencyACO > 0){
                $cACO->loadCountries(false, true, true, $term->lCurrencyACO);
                $term->ACO = clone($cACO->countries[0]);
+            }
+            if ($lFieldID < 0){  // indicates a "record written" field
+               $term->enumFieldType = CS_FT_CHECKBOX;
+               $term->strFieldNameUser  = 'Record written?';
+               $term->enumAttachType    = enumCRptAttachViaUTableID(-$lFieldID);
+               $clsUF = new muser_fields;
+               $clsUF->lTableID = -$lFieldID;
+               $clsUF->loadTableViaTableID();
+               $utable = &$clsUF->userTables[0];
+               $term->strUserTableName  = $utable->strUserTableName;
+            }
+            if ($term->lTableID > 0 ){
+               $term->strAttachLabel    = strLabelViaContextType($term->enumAttachType, true, false);
             }
 
             $term->curCompVal        = $row->crs_curCompVal;

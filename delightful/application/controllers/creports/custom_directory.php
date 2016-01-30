@@ -23,7 +23,7 @@ class custom_directory extends CI_Controller {
          //------------------------------------------------
       $this->load->library('generic_form');
       $this->load->helper ('reports/creport_util');
-      $this->load->model  ('admin/madmin_aco'); 
+      $this->load->model  ('admin/madmin_aco');
       $this->load->model  ('creports/mcreports',   'clsCReports');
       $this->load->model  ('util/mbuild_on_ready', 'clsOnReady');
       $this->load->model  ('admin/muser_accts',    'clsUser');
@@ -102,26 +102,26 @@ class custom_directory extends CI_Controller {
       $this->load->helper ('reports/creport_util');
       $params = array('enumStyle' => 'terse', 'clsRpt');
       $this->load->library('generic_rpt', $params);
+
       $this->load->helper ('creports/link_creports');
       $this->load->library('generic_form');
       $this->load->helper ('reports/creport_util');
       $this->load->helper ('reports/search');
-//      $this->load->helper ('creports/link_creports');
       $this->load->helper ('creports/creport_field');
       $this->load->helper ('creports/creport_tables');
       $this->load->helper ('dl_util/context');
       $this->load->helper ('dl_util/special_ddl');
       $this->load->helper ('dl_util/web_layout');
       $this->load->helper ('dl_util/time_date');
-      
-      $this->load->model  ('admin/madmin_aco'); 
+
+      $this->load->model  ('admin/madmin_aco');
       $this->load->model  ('creports/mcreports');
       $this->load->model  ('creports/mcrpt_search_terms');
       $this->load->model  ('creports/mcrpt_run',           'crptRun');
       $this->load->model  ('creports/mcrpt_terms_display', 'crptTD');
       $this->load->model  ('personalization/muser_fields', 'clsUF');
       $this->load->model  ('admin/mpermissions');
-      
+
       $this->load->model  ('util/mbuild_on_ready',         'clsOnReady');
 
       $this->load->helper ('js/div_hide_show');
@@ -138,14 +138,14 @@ class custom_directory extends CI_Controller {
          vid_bTestFail($this, false, 'Custom Report', $lReportID);
          return;
       }
-      
+
       $displayData['pageTitle']      = anchor('main/menu/reports', 'Reports', 'class="breadcrumb"')
                                 .' | '.anchor('creports/custom_directory/view/'.$glUserID, 'Custom Report Directory', 'class="breadcrumb"')
                                 .' | Custom Report: '.$report->strSafeName;
 
       $displayData['title']          = CS_PROGNAME.' | Reports';
       $displayData['nav']            = $this->mnav_brain_jar->navData();
-      
+
          // verify user has access to all tables referenced in report
       if (!$this->crptRun->bVerifyUserAccessToReport($report, $displayData['lNumFails'], $displayData['failTables'])){
          $displayData['mainTemplate']   = 'creports/report_notableaccess_view';
@@ -212,7 +212,7 @@ class custom_directory extends CI_Controller {
       $this->load->helper('dl_util/context');
       $this->load->helper('creports/creport_field');
       $this->load->helper('reports/creport_util');
-      $this->load->model ('admin/madmin_aco'); 
+      $this->load->model ('admin/madmin_aco');
       $this->load->model ('creports/mcreports', 'clsCReports');
 
           //------------------------------------------------
@@ -220,7 +220,8 @@ class custom_directory extends CI_Controller {
          //------------------------------------------------
       $displayData['cRptTypes'] = loadCReportTypeArray();
       $this->clsCReports->loadReportViaID($lReportID, true);
-      $displayData['report']    = $report = &$this->clsCReports->reports[0];
+      $displayData['lNumReports'] = $lNumReports = $this->clsCReports->lNumReports;
+      $displayData['report']      = $report = &$this->clsCReports->reports[0];
 
       if (!$report->bUserHasWriteAccess){
          vid_bTestFail($this, false, 'Custom Report', $lReportID);

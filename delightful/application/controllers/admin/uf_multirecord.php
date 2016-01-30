@@ -130,17 +130,11 @@ class uf_multirecord extends CI_Controller {
          }
       }else {
          $utable->strTableLabel = htmlspecialchars($utable->strUserTableName);
-/* -------------------------------------
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$utable   <pre>');
-echo(htmlspecialchars( print_r($utable, true))); echo('</pre></font><br>');
-die;
-// ------------------------------------- */
-         
+
          $displayData['bCusVerification'] = $bCusVerification =
                   $this->bSetVerificationFields($utable->strVerificationModule, $utable->strVModEntryPoint,
                                    $strVerificationModule, $strEntryPoint);
-         
+
       }
 
          //-------------------------
@@ -753,6 +747,8 @@ return(false);
                        <option value="-1">&nbsp;</option>'."\n"
                      .$this->clsUF->strDisplayUF_DDL($lFieldID, $lMatchIDs)
                      .'</select>'."\n";
+            }elseif ($enumType==CS_FT_CLIENTID){
+               if ($ufield->txtValue <= 0) $ufield->txtValue = '';               
             }
          }
       }

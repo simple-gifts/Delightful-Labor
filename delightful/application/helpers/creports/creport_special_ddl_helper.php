@@ -20,6 +20,7 @@ namespace crptDDL;
    //---------------------------------------------------------------------      
       $strSelect = $strJoin = '';
       if ($field->enumType != CS_FT_DDL_SPECIAL) return;
+      
       switch ($field->strUserFN){
          case 'Location':
             $strJoin = 'INNER JOIN client_location on cl_lKeyID=cr_lLocationID';
@@ -32,6 +33,10 @@ namespace crptDDL;
          case 'Vocabulary':
             $strJoin = 'LEFT JOIN lists_client_vocab ON cr_lVocID = cv_lKeyID';
             $strSelect = 'cv_strVocTitle AS `Client:Vocabulary`';
+            break;
+         case 'Accounting Country':
+            $strJoin = 'LEFT JOIN admin_aco ON pe_lACO = aco_lKeyID';
+            $strSelect = 'aco_strName AS `'.$field->strUserTableName.':Accounting Country`';
             break;
          default:
             screamForHelp($field->strUserFN.': client special ddl type not available<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);

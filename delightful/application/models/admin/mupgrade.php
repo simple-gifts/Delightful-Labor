@@ -1310,7 +1310,6 @@ class mupgrade extends CI_Model{
       return('Upgrade from 1.012 to 1.013 successful<br>');
    }
 
-
    public function upgrade_01_013_to_01_014(){
    //---------------------------------------------------------------------
    //
@@ -1318,9 +1317,10 @@ class mupgrade extends CI_Model{
          // upgrade 1.014
          // enhanced import features
       $sqlStr =
-           "ALTER TABLE `import_log` CHANGE `il_enumImportType` `il_enumImportType`
-            ENUM('people','business','gift','sponsorPayment','personalizedTable','client')
-            NULL DEFAULT NULL;";
+           "ALTER TABLE `import_log`
+               CHANGE `il_enumImportType` `il_enumImportType`
+                  ENUM('people','business','gift','sponsorPayment','personalizedTable','client')
+               NULL DEFAULT NULL;";
       $this->db->query($sqlStr);
 
       $sqlStr =
@@ -1329,15 +1329,49 @@ class mupgrade extends CI_Model{
          COMMENT 'Foreign key to uf_tables (for ptable imports only)'
          AFTER `il_enumImportType`, ADD INDEX (`il_lUTableID`);";
       $this->db->query($sqlStr);
-      
+
          // import ID for client records
       $sqlStr =
-         "ALTER TABLE `client_records` 
-             ADD `cr_strImportID` VARCHAR(40) NULL DEFAULT NULL AFTER `cr_lAttributedTo`;";   
+         "ALTER TABLE `client_records`
+             ADD `cr_strImportID` VARCHAR(40) NULL DEFAULT NULL AFTER `cr_lAttributedTo`;";
       $this->db->query($sqlStr);
 
       $this->upgradeDBLevel('1.014', 'enhanced import features');
       return('Upgrade from 1.013 to 1.014 successful<br>');
+   }
+
+   public function upgrade_01_014_to_01_015(){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $rptTypes = get_db_enum_values('creport_dir', 'crd_enumRptType');
+
+      $bAltered = false;
+      if (!in_array(CE_CRPT_PEOPLE, $rptTypes)){
+         $bAltered = true;
+         $rptTypes[] = CE_CRPT_PEOPLE;
+      }
+      if (!in_array(CE_CRPT_BIZ, $rptTypes)){
+         $bAltered = true;
+         $rptTypes[] = CE_CRPT_BIZ;
+      }
+      if (!in_array(CE_CRPT_VOLUNTEER, $rptTypes)){
+         $bAltered = true;
+         $rptTypes[] = CE_CRPT_VOLUNTEER;
+      }
+
+      if ($bAltered){
+         $enumTypes = "'".implode("','", $rptTypes)."'";
+         $sqlStr =
+           "ALTER TABLE `creport_dir`
+               CHANGE `crd_enumRptType` `crd_enumRptType`
+                  ENUM(".$enumTypes.")
+               NOT NULL;";
+         $this->db->query($sqlStr);
+      }
+
+      $this->upgradeDBLevel('1.015', 'Additional custom report support');
+      return('Upgrade from 1.014 to 1.015 successful<br>');
    }
 
 }

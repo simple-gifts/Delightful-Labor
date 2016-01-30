@@ -385,7 +385,7 @@
             $userRec->us_bDebugger       = $_POST['rdoDebug']=='true';
             $userRec->us_bAdmin          = $_POST['rdoAcctType']=='admin';
             $userRec->bStandardUser      = $_POST['rdoAcctType']=='user';
-            $userRec->bVolAccount        = $_POST['rdoAcctType']=='vol';
+            $userRec->bVolAccount        = $bAddVolAcct = $_POST['rdoAcctType']=='vol';
 
             $userRec->bVolEditContact       =
             $userRec->bVolPassReset         =
@@ -421,7 +421,7 @@
                $userRec->bVolViewHrsHistory    = @$_POST['chkVolViewHrsHistory']  == 'true';
                $userRec->bVolAddVolHours       = @$_POST['chkVolAddVolHours']     == 'true';
                $userRec->bVolShiftSignup       = @$_POST['chkVolShiftSignup']     == 'true';
-               $userRec->lPeopleID             = (int)@$_POST['txtPID'];
+               $userRec->lPeopleID             = $lPeopleID = (int)@$_POST['txtPID'];
             }elseif ($userRec->bStandardUser) {
                $userRec->bUserDataEntryPeople = @$_POST['chkUserDataEntryPeople']=='true';
                $userRec->bUserDataEntryGifts  = @$_POST['chkUserDataEntryGifts' ]=='true';
@@ -470,6 +470,26 @@
 
          if ($bNew){
             $lUserID = $local->clsUser->addUserAccount();
+
+               // need to create a people/vol account?
+            if ($bAsAdmin && $bAddVolAcct && ($lPeopleID<=0)){
+               $local->load->model('people/mpeople',  'clsPeople');
+               $local->load->model('vols/mvol',       'clsVol');
+               $local->load->model('personalization/muser_fields');
+               $local->load->model('personalization/muser_fields_create');
+               $local->load->helper('dl_util/util_db');
+
+               $lPeopleID = $local->clsPeople->addPeopleRecFromUserRec($lUserID);
+
+               $local->clsVol->volRecs = array();
+               $local->clsVol->volRecs[0] = new stdClass;
+               $vRec = &$local->clsVol->volRecs[0];
+               $vRec->lRegFormID = null;
+               $vRec->lPeopleID  = $lPeopleID;
+               $vRec->Notes      = 'Auto-generated via new volunteer account';
+               $lVolID    = $local->clsVol->lAddNewVolunteer();
+               $local->clsUser->addPeopleID_2_UserAccount($lUserID, $lPeopleID);
+            }
             $local->session->set_flashdata('msg', 'The new user was added');
          }else {
             $userRec->us_lKeyID   = $lUserID;

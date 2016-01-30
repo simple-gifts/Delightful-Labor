@@ -2,7 +2,7 @@
 /*---------------------------------------------------------------------
 // Delightful Labor!
 //
-// copyright (c) 2014-2015 by Database Austin
+// copyright (c) 2014-2016 by Database Austin
 // Austin, Texas
 //
 // This software is provided under the GPL.
@@ -206,6 +206,7 @@ class mcreports extends CI_Model{
 
       $query = $this->db->query($sqlStr);
       $this->lNumReports = $lNumReports = $query->num_rows();
+
       $idx = 0;
       if ($lNumReports == 0){
          $this->reports[0] = new stdClass;
@@ -252,6 +253,8 @@ class mcreports extends CI_Model{
             $cRpt->bUserHasReadAccess   = $gbAdmin || !$cRpt->bPrivate || $cRpt->bUserIsOwner;
             $cRpt->bUserHasWriteAccess  = $gbAdmin || $cRpt->bUserIsOwner;
 
+            $cRpt->bTestForBiz          = false;
+
             $cRpt->strCFName            = $row->strCFName;
             $cRpt->strCLName            = $row->strCLName;
             $cRpt->strSafeRptOwner      = htmlspecialchars($row->strCFName.' '.$row->strCLName);
@@ -270,6 +273,9 @@ class mcreports extends CI_Model{
             foreach ($cRpt->fields as $field){
                if ($field->enumType == CS_FT_CURRENCY){
                   $caco->setACOClassViaFieldID($field->lFieldID, $field->ACO);
+               }
+               if ($field->strFieldName == 'pe_lKeyID'){
+                  $cRpt->bTestForBiz = true;
                }
             }
          }
@@ -425,19 +431,18 @@ class mcreports extends CI_Model{
                $field->strUserFN        = $row->pff_strFieldNameUser;
                $field->enumType         = $row->pff_enumFieldType;
                $field->lSortIDX         = (int)$row->crf_lSortIDX;
-               $field->lFieldID         = (int)$row->crf_lFieldID;
+               $field->lFieldID         = $lFieldID = (int)$row->crf_lFieldID;
                $field->lTableID         = (int)$row->crf_lTableID;
                $field->strUserTableName = $row->pft_strUserTableName;
                $field->enumParentTable  = $row->pft_enumAttachType;
 
                if ($field->lTableID > 0 ){
                   $field->strAttachLabel   = strLabelViaContextType($field->enumParentTable, true, false);
+                  if ($lFieldID < 0){
+                     $field->enumType  = CS_FT_CHECKBOX;
+                     $field->strUserFN = 'Record Written?';
+                  }
                }
-/*
-               crptFieldPropsParentTable($field->lTableID, $field->strFieldName,
-                         $field->strUserTableName, $field->enumType,
-                         $field->strFieldName, $field->enumAttachType);
-*/
 
             }
             ++$idx;
@@ -583,7 +588,8 @@ class mcreports extends CI_Model{
             crst_strFieldID, crst_lSortIDX, crst_bLarkAscending,
             crst_lOriginID, crst_lLastUpdateID,
 
-            pff_strFieldNameUser, pff_enumFieldType, pft_strUserTableName, pft_enumAttachType,
+            pff_strFieldNameUser, pff_enumFieldType,
+            pft_lKeyID, pft_strUserTableName, pft_enumAttachType,
 
             usersC.us_strFirstName AS strCFName, usersC.us_strLastName AS strCLName,
             usersL.us_strFirstName AS strLFName, usersL.us_strLastName AS strLLName,
@@ -634,7 +640,7 @@ class mcreports extends CI_Model{
 
             $sortTerm->lKeyID           = (int)$row->crst_lKeyID;
             $sortTerm->lReportID        = (int)$row->crst_lReportID;
-            $sortTerm->lFieldID         = (int)$row->crst_lFieldID;
+            $sortTerm->lFieldID         = $lFieldID = (int)$row->crst_lFieldID;
             $sortTerm->lTableID         = (int)$row->crst_lTableID;
             $sortTerm->strFieldID       = $row->crst_strFieldID;
             $sortTerm->lSortIDX         = (int)$row->crst_lSortIDX;
@@ -644,10 +650,17 @@ class mcreports extends CI_Model{
                crptFieldPropsParentTable($sortTerm->lTableID, $sortTerm->strFieldID,
                          $sortTerm->strUserTableName, $sortTerm->enumFieldType, $sortTerm->strFieldNameUser, $sortTerm->enumAttachType);
             }else {
+                  // special case - field is UF Single Record Written test (field ID = -1)
+               if ($lFieldID < 0){
+                  $sortTerm->enumFieldType  = CS_FT_CHECKBOX;
+                  $sortTerm->enumAttachType = enumCRptAttachViaUTableID(-$lFieldID);
+               }else {
+                  $sortTerm->enumAttachType = $row->pft_enumAttachType;
+               }
                $sortTerm->enumFieldType     = $row->pff_enumFieldType;
                $sortTerm->strUserTableName  = $row->pft_strUserTableName;
                $sortTerm->strFieldNameUser  = $row->pff_strFieldNameUser;
-               $sortTerm->enumAttachType    = $row->pft_enumAttachType;
+
                $sortTerm->strAttachLabel    = strLabelViaContextType($sortTerm->enumAttachType, true, false);
             }
 
@@ -663,13 +676,8 @@ class mcreports extends CI_Model{
             ++$idx;
          }
       }
-/* -------------------------------------
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$sortTerms   <pre>');
-echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
-// ------------------------------------- */
-
    }
+
 
 
    /*------------------------------------------------------
@@ -710,10 +718,33 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
 
             $this->addBasePeopleFields($tables, $lTableIDX);
 
-               // personalized tables associated with clients
+               // personalized tables associated with people
             $this->crptSchema->sqlWhereExtra = '';
             $this->crptSchema->loadUFSchemaViaAttachType(CENUM_CONTEXT_PEOPLE, false, true);
             $this->ufSchema = &$this->crptSchema->schema;
+            break;
+
+         case CE_CRPT_BIZ:
+            $this->addReportTable($tables, $lTableIDX, $lFieldIDX, 'Business/Organization', 'people_names', CL_STID_BIZ);
+
+            $this->addBaseBizFields($tables, $lTableIDX);
+
+               // personalized tables associated with business
+            $this->crptSchema->sqlWhereExtra = '';
+            $this->crptSchema->loadUFSchemaViaAttachType(CENUM_CONTEXT_BIZ, false, true);
+            $this->ufSchema = &$this->crptSchema->schema;
+            break;
+
+         case CE_CRPT_VOLUNTEER:
+            $this->addReportTable($tables, $lTableIDX, $lFieldIDX, 'Volunteers', 'volunteers', CL_STID_VOL);
+
+            $this->addBaseVolFields($tables, $lTableIDX);
+
+               // personalized tables associated with business
+            $this->crptSchema->sqlWhereExtra = '';
+            $this->crptSchema->loadUFSchemaViaAttachType(CENUM_CONTEXT_VOLUNTEER, false, true);
+            $this->ufSchema = &$this->crptSchema->schema;
+            break;
 
          case CE_CRPT_CLIENTS:
             $this->addReportTable($tables, $lTableIDX, $lFieldIDX, 'Client', 'client_records', CL_STID_CLIENT);
@@ -731,7 +762,6 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
             break;
       }
 
-
          // transfer personalized tables to the master table structure
       $lNumPTables = count($this->ufSchema);
       if ($lNumPTables > 0){
@@ -743,7 +773,6 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
             }
          }
       }
-
       return($tables);
    }
 
@@ -752,11 +781,14 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
    //
    //---------------------------------------------------------------------
       $tables[$lTIdx] = new stdClass;
+      
       $t = &$tables[$lTIdx];
       $t->lTableID       = $pTable->lTableID;
       $t->name           = $pTable->strUserTableName;
       $t->internalTName  = $pTable->strDataTableName;
+      $t->strFieldPrefix = $pTable->strFieldPrefix;
       $t->enumAttachType = $pTable->enumAttachType;
+      $t->bMultiEntry    = $pTable->bMultiEntry;
       $t->strAttachLabel = strLabelViaContextType($t->enumAttachType, true, false);
       $t->tType = 'Personalized table: '.($pTable->bMultiEntry ? 'Multiple' : 'Single').'-entry';
       $t->fields = array();
@@ -768,6 +800,10 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
                  $pField->strFieldNameUser, $pField->strFieldNameInternal,
                  $pField->lCurrencyACO, $pField->lFieldID);
          }
+      }
+         // special case for single-entry: record written?
+      if (!$t->bMultiEntry){
+         createCFW_Field($t);
       }
    }
 
@@ -801,7 +837,6 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
       $fields = &$tables[$lTableIDX]->fields;
       $lFieldIDX = 0;
       $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'People ID',               'pe_lKeyID');
-
       $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'Household ID',            'pe_lHouseholdID');
       $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Title',                   'pe_strTitle');
       $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'First Name',              'pe_strFName');
@@ -825,6 +860,66 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
       $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Email',                   'pe_strEmail');
       $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Notes',                   'pe_strNotes');
       $this->addReportFields($fields, $lFieldIDX, CS_FT_CHECKBOX,      'No Gift Ack.',            'pe_bNoGiftAcknowledge');
+   }
+
+   function addBaseVolFields(&$tables, $lTableIDX){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $gclsChapterVoc;
+
+      $fields = &$tables[$lTableIDX]->fields;
+      $lFieldIDX = 0;
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'Volunteer ID',            'vol_lKeyID');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_CHECKBOX,      'Inactive',                'vol_bInactive');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'People ID',               'pe_lKeyID');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'Household ID',            'pe_lHouseholdID');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Title',                   'pe_strTitle');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'First Name',              'pe_strFName');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Middle Name',             'pe_strMName');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Last Name',               'pe_strLName');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Preferred Name',          'pe_strPreferredName');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Salutation',              'pe_strSalutation');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_DATE,          'Birth Date',              'pe_dteBirthDate');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Gender',                  'pe_enumGender');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'Accounting Country',      'pe_lACO');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Address 1',               'pe_strAddr1');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Address 2',               'pe_strAddr2');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'City',                    'pe_strCity');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          $gclsChapterVoc->vocState, 'pe_strState');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Country',                 'pe_strCountry');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          $gclsChapterVoc->vocZip,   'pe_strZip');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Phone',                   'pe_strPhone');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Cell',                    'pe_strCell');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Fax',                     'pe_strFax');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Web Site',                'pe_strWebSite');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Email',                   'pe_strEmail');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Notes',                   'pe_strNotes');
+   }
+
+   private function addBaseBizFields(&$tables, $lTableIDX){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $gclsChapterVoc;
+
+      $fields = &$tables[$lTableIDX]->fields;
+      $lFieldIDX = 0;
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'Business ID',             'pe_lKeyID');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Business/Org. Name',      'pe_strLName');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_ID,            'Accounting Country',      'pe_lACO');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Address 1',               'pe_strAddr1');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Address 2',               'pe_strAddr2');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'City',                    'pe_strCity');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          $gclsChapterVoc->vocState, 'pe_strState');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Country',                 'pe_strCountry');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          $gclsChapterVoc->vocZip,   'pe_strZip');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Phone',                   'pe_strPhone');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Cell',                    'pe_strCell');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Fax',                     'pe_strFax');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Web Site',                'pe_strWebSite');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Email',                   'pe_strEmail');
+      $this->addReportFields($fields, $lFieldIDX, CS_FT_TEXT,          'Notes',                   'pe_strNotes');
    }
 
    private function addBaseClientFields(&$tables, $lTableIDX){
@@ -984,15 +1079,6 @@ echo(htmlspecialchars( print_r($sortTerms, true))); echo('</pre></font><br>');
    //---------------------------------------------------------------------
       $lTableIDX = 0;
       foreach ($tables as $table){
-/* -------------------------------------
-$zzzlPos = @strrpos(__FILE__, '\\'); $zzzlLen=strlen(__FILE__); echo('<font class="debug">'.substr(__FILE__, @strrpos(__FILE__, '\\',-(($zzzlLen-$zzzlPos)+1))) .': '.__LINE__
-.":\$strInternalFN = $strInternalFN <br></font>\n");
-
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$table   <pre>');
-echo(htmlspecialchars( print_r($table, true))); echo('</pre></font><br>');
-// -------------------------------------*/
-
          $lFieldIDX = 0;
          foreach ($table->fields as $field){
             if ($field->internalName == $strInternalFN) return;

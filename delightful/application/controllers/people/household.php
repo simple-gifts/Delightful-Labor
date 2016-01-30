@@ -14,7 +14,9 @@ class household extends CI_Controller {
    //---------------------------------------------------------------------
       $this->load->helper('dl_util/verify_id');
       verifyID($this, $lHouseholdID, 'household ID');
-      verifyIDsViaType($this, CENUM_CONTEXT_PEOPLE, $lPID, true);
+      if ((int)$lPID > 0){
+         verifyIDsViaType($this, CENUM_CONTEXT_PEOPLE, $lPID, true);
+      }
 
       $displayData = array();
       $displayData['lHouseholdID'] = $lHouseholdID = (integer)$lHouseholdID;

@@ -7,6 +7,10 @@ RELEASE INFORMATION
 -------------------
     date         software ver.     db ver.    notes
     ----------   -------------   ----------   ---------------------------------------------
+    2016-01-30      2.011          1.015      - corrected bug in volunteer account generation
+                                              - added custom report generation for people, business,
+                                                and volunteers                                                
+                                              
     2016-01-15      2.010          1.014      - added the ability to set person as volunteer during people import
                                               - personalized table imports
                                               - admins can now set developer mode directly from account edit

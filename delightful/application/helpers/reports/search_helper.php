@@ -43,7 +43,6 @@ define('CL_SRCH_STR_NOTCONTAIN', 22);  // does not contain the string
 define('CL_SRCH_CHK_YES', 3);   // Yes
 define('CL_SRCH_CHK_NO',  4);   // No
 
-
   //---------------------------------------
   // booleans
   //---------------------------------------
@@ -84,6 +83,7 @@ define('CL_STID_GIFTS',      -2);   // gifts
 define('CL_STID_PEOPLEBIZ',  -3);   // people/business
 define('CL_STID_PEOPLE',     -4);   // people
 define('CL_STID_BIZ',        -5);   // business
+define('CL_STID_VOL',        -6);   // volunteer
 
 
 
@@ -143,6 +143,21 @@ define('CL_STID_BIZ',        -5);   // business
             $enumAttachType = null;
             crptFieldPropsClient($strFN, $enumFType, $strUserFN);
             break;
+         case CL_STID_PEOPLE:
+            $strTableName = 'People Table';
+            $enumAttachType = null;
+            crptFieldPropsPeople($strFN, $enumFType, $strUserFN);
+            break;
+         case CL_STID_BIZ:
+            $strTableName = 'Business/Organization Table';
+            $enumAttachType = null;
+            crptFieldPropsBiz($strFN, $enumFType, $strUserFN);
+            break;
+         case CL_STID_VOL:
+            $strTableName = 'Volunteer Table';
+            $enumAttachType = null;
+            crptFieldPropsVol($strFN, $enumFType, $strUserFN);
+            break;
          default:
             screamForHelp($lTableID.': invalid table ID<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
             break;
@@ -184,7 +199,170 @@ define('CL_STID_BIZ',        -5);   // business
       }
    }
 
+   function crptFieldPropsPeople($strFN, &$enumFType, &$strUserFN){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $gclsChapterVoc;
 
+      switch ($strFN){
+         case 'pe_lKeyID'             : $enumFType = CS_FT_ID          ; $strUserFN = 'People ID'         ; break;
+         case 'pe_lHouseholdID'       : $enumFType = CS_FT_ID          ; $strUserFN = 'Household ID'      ; break;
+         case 'pe_strTitle'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Title'             ; break;
+         case 'pe_strFName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'First Name'        ; break;
+         case 'pe_strMName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Middle Name'       ; break;
+         case 'pe_strLName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Last Name'         ; break;
+         case 'pe_strPreferredName'   : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Preferred Name'    ; break;
+         case 'pe_strSalutation'      : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Salutation'        ; break;
+         case 'pe_dteBirthDate'       : $enumFType = CS_FT_DATE        ; $strUserFN = 'Birth Date'        ; break;
+         case 'pe_enumGender'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Gender'            ; break;
+         case 'pe_lACO'               : $enumFType = CS_FT_DDL_SPECIAL ; $strUserFN = 'Accounting Country'; break;
+         case 'pe_strAddr1'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Address 1'              ; break;
+         case 'pe_strAddr2'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Address 2'              ; break;
+         case 'pe_strCity'            : $enumFType = CS_FT_TEXT        ; $strUserFN = 'City'                   ; break;
+         case 'pe_strState'           : $enumFType = CS_FT_TEXT        ; $strUserFN = $gclsChapterVoc->vocState; break;
+         case 'pe_strCountry'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Country'                ; break;
+         case 'pe_strZip'             : $enumFType = CS_FT_TEXT        ; $strUserFN = $gclsChapterVoc->vocZip  ; break;
+         case 'pe_strPhone'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Phone'                  ; break;
+         case 'pe_strCell'            : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Cell'                   ; break;
+         case 'pe_strFax'             : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Fax'                    ; break;
+         case 'pe_strWebSite'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Web Site'               ; break;
+         case 'pe_strEmail'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Email'                  ; break;
+         case 'pe_strNotes'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Notes'                  ; break;
+         case 'pe_bNoGiftAcknowledge' : $enumFType = CS_FT_CHECKBOX    ; $strUserFN = 'No Gift Acknowledge'    ; break;
+         case 'pe_strImportID'        : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Import ID'    ; break;
+
+         default:
+            screamForHelp($strFN.': invalid field ID<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+   }
+
+   function crptFieldPropsVol($strFN, &$enumFType, &$strUserFN){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $gclsChapterVoc;
+
+      switch ($strFN){
+         case 'vol_lKeyID'            : $enumFType = CS_FT_ID          ; $strUserFN = 'Volunteer ID'      ; break;
+         case 'vol_bInactive'         : $enumFType = CS_FT_CHECKBOX    ; $strUserFN = 'Volunteer Inactive'; break;
+         case 'pe_lKeyID'             : $enumFType = CS_FT_ID          ; $strUserFN = 'People ID'         ; break;
+         case 'pe_lHouseholdID'       : $enumFType = CS_FT_ID          ; $strUserFN = 'Household ID'      ; break;
+         case 'pe_strTitle'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Title'             ; break;
+         case 'pe_strFName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'First Name'        ; break;
+         case 'pe_strMName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Middle Name'       ; break;
+         case 'pe_strLName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Last Name'         ; break;
+         case 'pe_strPreferredName'   : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Preferred Name'    ; break;
+         case 'pe_strSalutation'      : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Salutation'        ; break;
+         case 'pe_dteBirthDate'       : $enumFType = CS_FT_DATE        ; $strUserFN = 'Birth Date'        ; break;
+         case 'pe_enumGender'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Gender'            ; break;
+         case 'pe_lACO'               : $enumFType = CS_FT_DDL_SPECIAL ; $strUserFN = 'Accounting Country'; break;
+         case 'pe_strAddr1'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Address 1'              ; break;
+         case 'pe_strAddr2'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Address 2'              ; break;
+         case 'pe_strCity'            : $enumFType = CS_FT_TEXT        ; $strUserFN = 'City'                   ; break;
+         case 'pe_strState'           : $enumFType = CS_FT_TEXT        ; $strUserFN = $gclsChapterVoc->vocState; break;
+         case 'pe_strCountry'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Country'                ; break;
+         case 'pe_strZip'             : $enumFType = CS_FT_TEXT        ; $strUserFN = $gclsChapterVoc->vocZip  ; break;
+         case 'pe_strPhone'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Phone'                  ; break;
+         case 'pe_strCell'            : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Cell'                   ; break;
+         case 'pe_strFax'             : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Fax'                    ; break;
+         case 'pe_strWebSite'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Web Site'               ; break;
+         case 'pe_strEmail'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Email'                  ; break;
+         case 'pe_strNotes'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Notes'                  ; break;
+         case 'pe_strImportID'        : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Import ID'    ; break;
+
+         default:
+            screamForHelp($strFN.': invalid field ID<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+   }
+
+   function crptFieldPropsBiz($strFN, &$enumFType, &$strUserFN){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $gclsChapterVoc;
+
+      switch ($strFN){
+         case 'pe_lKeyID'             : $enumFType = CS_FT_ID          ; $strUserFN = 'Business ID'            ; break;
+         case 'pe_strLName'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Business Name'          ; break;
+         case 'pe_strPreferredName'   : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Preferred Name'         ; break;
+         case 'pe_lACO'               : $enumFType = CS_FT_DDL_SPECIAL ; $strUserFN = 'Accounting Country'     ; break;
+         case 'pe_strAddr1'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Address 1'              ; break;
+         case 'pe_strAddr2'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Address 2'              ; break;
+         case 'pe_strCity'            : $enumFType = CS_FT_TEXT        ; $strUserFN = 'City'                   ; break;
+         case 'pe_strState'           : $enumFType = CS_FT_TEXT        ; $strUserFN = $gclsChapterVoc->vocState; break;
+         case 'pe_strCountry'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Country'                ; break;
+         case 'pe_strZip'             : $enumFType = CS_FT_TEXT        ; $strUserFN = $gclsChapterVoc->vocZip  ; break;
+         case 'pe_strPhone'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Phone'                  ; break;
+         case 'pe_strCell'            : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Cell'                   ; break;
+         case 'pe_strFax'             : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Fax'                    ; break;
+         case 'pe_strWebSite'         : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Web Site'               ; break;
+         case 'pe_strEmail'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Email'                  ; break;
+         case 'pe_strNotes'           : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Notes'                  ; break;
+         case 'pe_strImportID'        : $enumFType = CS_FT_TEXT        ; $strUserFN = 'Import ID'    ; break;
+
+         default:
+            screamForHelp($strFN.': invalid field ID<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
+            break;
+      }
+   }
+
+   function addField_CheckForWritten(&$tables){
+   //---------------------------------------------------------------------
+   // add meta field for single entry tables - has record been written?
+   //---------------------------------------------------------------------
+      foreach ($tables as $table){
+         if ($table->lTableID > 0){
+            if (!$table->bMultiEntry){
+               createCFW_Field($table);
+            }
+         }
+      }
+   }
+
+   function createCFW_Field(&$table){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $lNumFields = count($table->fields);
+      $table->fields[$lNumFields] = new stdClass;
+      $wField = &$table->fields[$lNumFields];
+
+      $wField->lFieldID     = -$table->lTableID;
+      $wField->publicName   = 'Record written?';
+      $wField->internalName = $table->strFieldPrefix.'_bRecordEntered';
+      $wField->enumType     = CS_FT_CHECKBOX;
+      $wField->lCurrencyACO = null;
+      $wField->fTypeLabel   = 'Checkbox';
+      return($lNumFields);  // field index for new field
+   }
+
+   function bTestFor_CheckForWritten($strFName){
+      return (strpos($strFName, '_bRecordEntered')==9);
+   }
+
+   function lTableIDX_ViaTName_CFW($tables, $strTName){
+      $lNumTables = count($tables);
+      for ($idx=0; $idx<$lNumTables; ++$idx){
+         if ($tables[$idx]->internalTName==$strTName) return($idx);
+      }
+      return(null);
+   }
+
+   function enumCRptAttachViaUTableID($lTableID){
+      $CI =& get_instance();
+      $sqlStr =
+        "SELECT pft_enumAttachType
+         FROM uf_tables
+         WHERE pft_lKeyID=$lTableID;";
+
+      $query = $CI->db->query($sqlStr);
+      $row = $query->row();
+      return($row->pft_enumAttachType);
+   }
+   
 
 /*
    //---------------------------------------------

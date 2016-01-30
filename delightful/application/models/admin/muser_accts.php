@@ -743,7 +743,24 @@ class muser_accts extends CI_Model{
              us_lLastUpdateID   = $glUserID
           WHERE us_lKeyID=$lUserID;";
 
-      $query = $this->db->query($sqlStr);
+      $this->db->query($sqlStr);
+   }
+
+   function addPeopleID_2_UserAccount($lUserID, $lPeopleID){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      global $glUserID;
+
+      $sqlStr =
+         "UPDATE admin_users
+          SET
+             us_lPeopleID       = $lPeopleID,
+             us_dteLastUpdate   = NOW(),
+             us_lLastUpdateID   = $glUserID
+          WHERE us_lKeyID=$lUserID;";
+
+      $this->db->query($sqlStr);
    }
 
    function updateUserAcctViaPeopleInfo($lUserID, &$pRec){

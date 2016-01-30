@@ -23,27 +23,27 @@
       // close the magic window
    echoT('</table></div>'."\n");
 
-   
+
    function displayCReportData($report, $lNumCRecs, &$crecs){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
       if ($lNumCRecs == 0) return;
       foreach ($crecs as $cr){
+         if ($report->bTestForBiz){
+            $bBiz = $cr['bBiz'];
+         }else {
+            $bBiz = false;
+         }
+
          echoT('<tr class="makeStripe">'."\n");
          foreach ($report->fields as $field){
-            echoT(fdh\strDisplayValueViaType(
-                        $cr[$field->strSelectAsName], $field->enumType, 
-                        $field->lTableID, true, $field->displayWidth)."\n");
-//echoT('<td class="enpRpt">Hello</td>');            
+            echoT(fdh\strDisplayValueViaType($bBiz, $cr[$field->strSelectAsName], $field, true)."\n");
          }
-         
          echoT('</tr>'."\n");
       }
    }
-   
-   
-   
+
    function displayCReportHeader($report){
    //---------------------------------------------------------------------
    //
@@ -56,12 +56,6 @@
             </td>'."\n");
       }
       echoT('</tr>'."\n");
-/* -------------------------------------
-echo('<font class="debug">'.substr(__FILE__, strrpos(__FILE__, '\\'))
-   .': '.__LINE__.'<br>$report   <pre>');
-echo(htmlspecialchars( print_r($report, true))); echo('</pre></font><br>');
-// ------------------------------------- */
-
    }
 
    function lSetColDisplayWidths(&$report){

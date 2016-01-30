@@ -25,6 +25,15 @@ namespace crptFields;
                case CL_STID_CLIENT:
                   populateClientField($field);
                   break;
+               case CL_STID_PEOPLE:
+                  populatePeopleField($field);
+                  break;
+               case CL_STID_BIZ:
+                  populateBizField($field);
+                  break;
+               case CL_STID_VOL:
+                  populateVolField($field);
+                  break;
                default:
                   screamForHelp($field->lTableID.': parent table type not available yet<br>error on line  <b> -- '.__LINE__.' --</b>,<br>file '.__FILE__.',<br>function '.__FUNCTION__);
                   break;
@@ -41,7 +50,34 @@ namespace crptFields;
       $field->enumParentTable = CENUM_CONTEXT_CLIENT;
       crptFieldPropsClient($field->strFieldName, $field->enumType, $field->strUserFN);
    }
+
+   function populatePeopleField(&$field){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $field->strUserTableName = 'People';
+      $field->enumParentTable = CENUM_CONTEXT_PEOPLE;
+      crptFieldPropsPeople($field->strFieldName, $field->enumType, $field->strUserFN);
+   }
    
+   function populateVolField(&$field){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $field->strUserTableName = 'Volunteer';
+      $field->enumParentTable = CENUM_CONTEXT_VOLUNTEER;
+      crptFieldPropsVol($field->strFieldName, $field->enumType, $field->strUserFN);
+   }
+   
+   function populateBizField(&$field){
+   //---------------------------------------------------------------------
+   //
+   //---------------------------------------------------------------------
+      $field->strUserTableName = 'Business/Organization';
+      $field->enumParentTable = CENUM_CONTEXT_BIZ;
+      crptFieldPropsBiz($field->strFieldName, $field->enumType, $field->strUserFN);
+   }
+
    function strSelectTermViaFieldInfo($field){
    //---------------------------------------------------------------------
    //
@@ -50,7 +86,7 @@ namespace crptFields;
       if ($field->lTableID > 0){
          $strField .= strtoupper(substr($field->enumParentTable, 0, 1))
                     .substr($field->enumParentTable, 1).':';
-      }         
+      }
       $strField .= $field->strUserTableName.':'.$field->strUserFN;
       return(strEscMysqlQuote($strField));
    }

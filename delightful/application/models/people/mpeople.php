@@ -880,6 +880,62 @@ class mpeople extends CI_Model{
       }
    }
 
+   function addPeopleRecFromUserRec($lUserID){
+   //---------------------------------------------------------------------
+   // create a people record based on the account record
+   //---------------------------------------------------------------------
+      global $gclsChapterACO;
+
+      $this->people = array();
+      $this->people[0] = new stdClass;
+      $pRec = &$this->people[0];
+      $pRec->lHouseholdID      = 0;
+      $pRec->lAttributedTo     = null;
+      $pRec->enumGender        = 'Unknown';
+      $pRec->dteExpire         = null;
+      $pRec->lACO              = $gclsChapterACO->lKeyID;
+      $pRec->dteMysqlBirthDate = null;
+      $pRec->dteMysqlDeath     = null;
+      $pRec->strNotes          = 'Auto-generated from user account '.str_pad($lUserID, 5, '0', STR_PAD_LEFT);
+
+         // load the user account
+      $sqlStr =
+        "SELECT
+            us_strFirstName, us_strLastName, us_strTitle,
+            us_strPhone, us_strCell, us_strEmail,
+            us_strAddr1, us_strAddr2, us_strCity,
+            us_strState, us_strCountry, us_strZip
+         FROM admin_users
+         WHERE us_lKeyID=$lUserID;";
+      $query = $this->db->query($sqlStr);
+      $numRows = $query->num_rows();
+      if ($numRows != 1) {
+         echo('<font face="monospace" style="font-size: 8pt;">'.__FILE__.' Line: <b>'.__LINE__.":</b><br><b>\$sqlStr=</b><br>".nl2br($sqlStr)."<br><br></font>\n");
+         screamForHelp('UNEXPECTED EOF<br>error on <b>line:</b> '.__LINE__.'<br><b>file: </b>'.__FILE__.'<br><b>function: </b>'.__FUNCTION__);
+      }else {
+         $row = $query->row();
+
+         $pRec->strTitle           = $row->us_strTitle;
+         $pRec->strFName           = $row->us_strFirstName;
+         $pRec->strMName           = '';
+         $pRec->strLName           = $row->us_strLastName;
+         $pRec->strPreferredName   = $row->us_strFirstName;
+         $pRec->strSalutation      = $row->us_strFirstName;
+         $pRec->strAddr1           = $row->us_strAddr1;
+         $pRec->strAddr2           = $row->us_strAddr2;
+         $pRec->strCity            = $row->us_strCity;
+         $pRec->strState           = $row->us_strState;
+         $pRec->strCountry         = $row->us_strCountry;
+         $pRec->strZip             = $row->us_strZip;
+         $pRec->strPhone           = $row->us_strPhone;
+         $pRec->strCell            = $row->us_strCell;
+         $pRec->strEmail           = $row->us_strEmail;
+
+         $lPeopleID = $this->lCreateNewPeopleRec();
+         return($lPeopleID);
+      }
+   }
+
 
 }
 

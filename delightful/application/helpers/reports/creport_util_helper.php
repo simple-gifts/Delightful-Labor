@@ -34,7 +34,9 @@ function loadCReportTypeArray(){
 //   buildCRptClass(CE_CRPT_GIFTS_MEM,       $cRptTypes[CE_CRPT_GIFTS_MEM      ]);
 //   buildCRptClass(CE_CRPT_GIFTS_PER,       $cRptTypes[CE_CRPT_GIFTS_PER      ]);                                                        
    buildCRptClass(CE_CRPT_CLIENTS,         $cRptTypes[CE_CRPT_CLIENTS        ]);
-//   buildCRptClass(CE_CRPT_PEOPLE,          $cRptTypes[CE_CRPT_PEOPLE        ]);
+   buildCRptClass(CE_CRPT_PEOPLE,          $cRptTypes[CE_CRPT_PEOPLE         ]);
+   buildCRptClass(CE_CRPT_BIZ,             $cRptTypes[CE_CRPT_BIZ            ]);
+   buildCRptClass(CE_CRPT_VOLUNTEER,       $cRptTypes[CE_CRPT_VOLUNTEER      ]);
 //   buildCRptClass(CE_CRPT_CLIENTS_CPROG,   $cRptTypes[CE_CRPT_CLIENTS_CPROG  ]);
 //   buildCRptClass(CE_CRPT_CLIENTS_SPON,    $cRptTypes[CE_CRPT_CLIENTS_SPON   ]);
 //   buildCRptClass(CE_CRPT_CLIENTS_SPONPAY, $cRptTypes[CE_CRPT_CLIENTS_SPONPAY]);
@@ -82,6 +84,18 @@ function buildCRptClass($enumCRpt, &$cCRpt){
          $cCRpt->strLabel   = 'People';
          $cCRpt->bIncludeUF = true;
          $cCRpt->enumBaseRptType = CENUM_CONTEXT_PEOPLE;
+         break;
+         
+      case CE_CRPT_BIZ:
+         $cCRpt->strLabel   = 'Business/Organization';
+         $cCRpt->bIncludeUF = true;
+         $cCRpt->enumBaseRptType = CENUM_CONTEXT_BIZ;
+         break;
+
+      case CE_CRPT_VOLUNTEER:
+         $cCRpt->strLabel   = 'Volunteers';
+         $cCRpt->bIncludeUF = true;
+         $cCRpt->enumBaseRptType = CENUM_CONTEXT_VOLUNTEER;
          break;
 
          // clients

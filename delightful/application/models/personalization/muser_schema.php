@@ -175,10 +175,15 @@ class muser_schema extends CI_Model{
             $fields[$idx] = new stdClass;
             $field = &$fields[$idx];
 
-            $field->lFieldID             = $row->pff_lKeyID;
+            $field->lFieldID             = $lFieldID = $row->pff_lKeyID;
+            $field->lTableID             = $lTableID;
             $field->lSortIDX             = $row->pff_lSortIDX;
             $field->strFieldNameInternal = $row->pff_strFieldNameInternal;
-            $field->strFieldNameUser     = $row->pff_strFieldNameUser;
+            if ($lFieldID < 0){
+               $field->strFieldNameUser  = 'Record written?';
+            }else {
+               $field->strFieldNameUser  = $row->pff_strFieldNameUser;
+            }
             $field->strFieldNotes        = $row->pff_strFieldNotes;
             $field->enumFieldType        = $row->pff_enumFieldType;
             $field->bRequired            = $row->pff_bRequired;

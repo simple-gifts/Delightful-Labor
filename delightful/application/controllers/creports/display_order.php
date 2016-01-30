@@ -8,7 +8,6 @@ class display_order extends CI_Controller {
       setGlobals($this);
    }
 
-
    function addEditDisplayTermOrder($lReportID){
    //---------------------------------------------------------------------
    //

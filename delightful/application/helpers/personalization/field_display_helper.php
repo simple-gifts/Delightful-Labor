@@ -12,11 +12,18 @@
 ---------------------------------------------------------------------*/
 namespace fdh;
 
-   function strDisplayValueViaType($vVal, $enumType, $lTableID, $bAsTableRow, $lWidth=0, $strClass='enpRpt', $strStyleExtra=''){
+   function strDisplayValueViaType($bBiz, $vVal, $field, $bAsTableRow,
+                  $strClass='enpRpt', $strStyleExtra=''){
+              // $vVal, $enumType, $lTableID, $bAsTableRow, $strFieldName, $lWidth=0, $strClass='enpRpt', $strStyleExtra=''){
    //---------------------------------------------------------------------
    //
    //---------------------------------------------------------------------
       global $gbDateFormatUS;
+
+      $enumType     = $field->enumType;
+      $lTableID     = $field->lTableID;
+      $strFieldName = $field->strFieldName;
+      $lWidth       = $field->displayWidth;
 
       $strAlign = 'left';
       switch ($enumType){
@@ -47,17 +54,24 @@ namespace fdh;
             $strOut = nl2br(htmlspecialchars($vVal));
             break;
 
+         case CS_FT_CLIENTID:
          case CS_FT_ID:
             $strAlign = 'center';
             $strOut = str_pad($vVal, 5, '0', STR_PAD_LEFT);
-            switch ($lTableID){
-               case CL_STID_CLIENT:    $strOut .= '&nbsp;'.strLinkView_ClientRecord($vVal, 'View client record', true); break;
-               case CL_STID_GIFTS:     $strOut .= '&nbsp;'.strLinkView_GiftsRecord ($vVal, 'View gift record',   true); break;
-               case CL_STID_PEOPLEBIZ: break;
-               case CL_STID_PEOPLE:    $strOut .= '&nbsp;'.strLinkView_PeopleRecord($vVal, 'View people record', true); break;
-               case CL_STID_BIZ:       $strOut .= '&nbsp;'.strLinkView_BizRecord   ($vVal, 'View business/organization record', true); break;
-            }
 
+            switch ($strFieldName){
+               case 'cr_lKeyID':       $strOut .= '&nbsp;'.strLinkView_ClientRecord($vVal, 'View client record', true); break;
+               case 'gi_lKeyID':       $strOut .= '&nbsp;'.strLinkView_GiftsRecord ($vVal, 'View gift record',   true); break;
+               case 'pe_lKeyID':
+                  if ($bBiz){
+                     $strOut .= '&nbsp;'.strLinkView_BizRecord   ($vVal, 'View business/organization record', true);
+                  }else {
+                     $strOut .= '&nbsp;'.strLinkView_PeopleRecord($vVal, 'View people record', true); 
+                  }
+                  break;
+               case 'vol_lKeyID':      $strOut .= '&nbsp;'.strLinkView_Volunteer($vVal, 'View volunteer record', true);  break;
+               case 'pe_lHouseholdID': $strOut .= '&nbsp;'.strLinkView_Household($vVal, -1, 'View Household', true);     break;
+            }
             break;
 
          case CS_FT_INTEGER:

@@ -37,6 +37,7 @@ class search_order extends CI_Controller {
       $this->load->helper ('dl_util/web_layout');
       $this->load->helper ('creports/link_creports');
       $this->load->model  ('admin/madmin_aco'); 
+      $this->load->model  ('admin/mpermissions');
       $this->load->model  ('personalization/muser_fields');
       $this->load->model  ('creports/mcreports',           'clsCReports');
       $this->load->model  ('creports/mcrpt_search_terms',  'crptTerms');

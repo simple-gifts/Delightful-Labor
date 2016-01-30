@@ -38,6 +38,7 @@ class search_parens extends CI_Controller {
       $this->load->helper ('creports/creport_field');
       $this->load->helper ('dl_util/context');
       $this->load->model  ('admin/madmin_aco'); 
+      $this->load->model  ('admin/mpermissions', 'perms');
       $this->load->model  ('personalization/muser_fields');
       $this->load->model  ('creports/mcreports',           'clsCReports');
       $this->load->model  ('creports/mcrpt_search_terms',  'crptTerms');

@@ -413,6 +413,9 @@ class muser_fields extends CI_Model{
    //---------------------------------------------------------------------
    // 
    //---------------------------------------------------------------------
+         // special case - record written?
+      if ($lFieldID < 0) return(true);
+      
       $sqlStr = 
          "SELECT COUNT(*) AS lNumRecs 
           FROM uf_fields 
